@@ -1,0 +1,1027 @@
+/* ==========================================================================
+   E.P.E.T. N° 4 "Gendarmería Nacional" — Junín de los Andes, Neuquén
+   Estética: Grafito Carbono & Naranja/Rojo Industrial (Cyber-Technical Dark)
+   Neumorfismo Oscuro de Ingeniería (#141518 / #1c1e24 / #ff4d2d / #facc15)
+   ========================================================================== */
+
+:root {
+  /* Superficie Grafito Carbono Casi Negro */
+  --bg-main: #141518;
+  --bg-surface: #1a1c22;
+  --bg-elevated: #20232b;
+
+  /* Textos de Alto Contraste Técnico */
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  /* Sombras Neumórficas sobre Carbono */
+  --shadow-dark: #090a0c;
+  --shadow-light: #252830;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-tech: rgba(255, 77, 45, 0.28);
+
+  /* Relieves Neumórficos Compuestos */
+  --neu-extruded: 9px 9px 18px var(--shadow-dark), -7px -7px 16px var(--shadow-light);
+  --neu-extruded-sm: 5px 5px 11px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+  --neu-extruded-lg: 14px 14px 28px var(--shadow-dark), -10px -10px 24px var(--shadow-light);
+  --neu-inset: inset 6px 6px 12px var(--shadow-dark), inset -5px -5px 11px var(--shadow-light);
+  --neu-inset-sm: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+
+  /* Acentos de Tablero Industrial */
+  --mech-orange: #ff4d2d;
+  --mech-orange-hover: #ff6448;
+  --mech-orange-soft: rgba(255, 77, 45, 0.14);
+  --tech-yellow: #facc15;
+  --tech-yellow-soft: rgba(250, 204, 21, 0.14);
+  --electro-cyan: #38bdf8;
+  --electro-cyan-soft: rgba(56, 189, 248, 0.14);
+  --alimentos-emerald: #10b981;
+  --alimentos-emerald-soft: rgba(16, 185, 129, 0.14);
+  --danger-crimson: #f43f5e;
+
+  /* Radios y Transiciones */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 9999px;
+  --transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-main);
+  background-image:
+    radial-gradient(circle at 12% 15%, rgba(255, 77, 45, 0.06) 0%, transparent 35%),
+    radial-gradient(circle at 88% 85%, rgba(250, 204, 21, 0.04) 0%, transparent 35%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ==========================================================================
+   Componentes Neumórficos Dark Carbon
+   ========================================================================== */
+
+.neu-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--neu-extruded);
+  border: 1px solid var(--border-subtle);
+  padding: 1.75rem;
+  position: relative;
+  transition: var(--transition);
+}
+
+.neu-card-sm {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--neu-extruded-sm);
+  border: 1px solid var(--border-subtle);
+  padding: 1.2rem;
+  transition: var(--transition);
+}
+
+.neu-well {
+  background: var(--bg-main);
+  border-radius: var(--radius-md);
+  box-shadow: var(--neu-inset);
+  border: 1px solid rgba(255, 255, 255, 0.025);
+  padding: 1.25rem;
+}
+
+.neu-well-sm {
+  background: var(--bg-main);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neu-inset-sm);
+  border: 1px solid rgba(255, 255, 255, 0.025);
+  padding: 0.8rem 1rem;
+}
+
+.neu-pill {
+  background: var(--bg-main);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--neu-inset-sm);
+  border: 1px solid var(--border-subtle);
+  padding: 0.36rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* Botones Táctiles de Tablero Industrial */
+.neu-btn {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--neu-extruded-sm);
+  padding: 0.8rem 1.35rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  transition: var(--transition);
+  user-select: none;
+  text-decoration: none;
+}
+
+.neu-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--border-tech);
+  color: var(--mech-orange);
+  box-shadow: 7px 7px 16px var(--shadow-dark), -5px -5px 14px var(--shadow-light);
+}
+
+.neu-btn:active:not(:disabled),
+.neu-btn.active {
+  transform: translateY(0);
+  box-shadow: var(--neu-inset-sm);
+}
+
+.neu-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: var(--neu-inset-sm);
+  color: var(--text-muted);
+}
+
+.neu-btn-primary {
+  background: linear-gradient(135deg, #ff4d2d 0%, #ea580c 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 5px 5px 14px var(--shadow-dark), 0 0 18px rgba(255, 77, 45, 0.25);
+}
+
+.neu-btn-primary:hover:not(:disabled) {
+  color: #ffffff;
+  filter: brightness(1.08);
+  box-shadow: 6px 6px 18px var(--shadow-dark), 0 0 24px rgba(255, 77, 45, 0.45);
+}
+
+.neu-btn-yellow {
+  background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+  color: #111317;
+  border: none;
+  box-shadow: 5px 5px 14px var(--shadow-dark), 0 0 16px rgba(250, 204, 21, 0.25);
+}
+
+.neu-btn-yellow:hover:not(:disabled) {
+  color: #111317;
+  filter: brightness(1.06);
+}
+
+.neu-btn-success {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  border: none;
+}
+
+.neu-btn-success:hover:not(:disabled) {
+  color: #ffffff;
+  filter: brightness(1.08);
+}
+
+.neu-btn-danger {
+  color: var(--danger-crimson);
+}
+
+.neu-btn-danger:hover:not(:disabled) {
+  color: var(--danger-crimson);
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
+/* Botón de Certificado de 200 Horas */
+.neu-btn-certificate {
+  width: 100%;
+  padding: 1.05rem 1.4rem;
+  border-radius: var(--radius-md);
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.neu-btn-certificate.unlocked {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 6px 6px 16px var(--shadow-dark), 0 0 22px rgba(16, 185, 129, 0.38);
+}
+
+.neu-btn-certificate.unlocked:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 8px 8px 20px var(--shadow-dark), 0 0 30px rgba(16, 185, 129, 0.55);
+}
+
+.neu-btn-certificate.locked {
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset-sm);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  border: 1px dashed rgba(107, 114, 128, 0.35);
+}
+
+/* Inputs, Selects y Textareas tallados en Grafito */
+.neu-input,
+.neu-select,
+.neu-textarea {
+  width: 100%;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  border: 1.5px solid rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  box-shadow: var(--neu-inset-sm);
+  padding: 0.85rem 1.1rem;
+  font-family: inherit;
+  font-size: 0.94rem;
+  transition: var(--transition);
+  outline: none;
+}
+
+.neu-select option {
+  background: #1a1c22;
+  color: #f3f4f6;
+}
+
+.neu-input::placeholder,
+.neu-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.neu-input:focus,
+.neu-select:focus,
+.neu-textarea:focus {
+  border-color: var(--mech-orange);
+  box-shadow: var(--neu-inset), 0 0 0 3px rgba(255, 77, 45, 0.14);
+}
+
+.form-group {
+  margin-bottom: 1.1rem;
+}
+
+.form-label {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  margin-bottom: 0.42rem;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.95rem;
+}
+
+/* ==========================================================================
+   PANTALLA 1: PORTAL DE ENTRADA CON LOS 3 ROLES SEPARADOS
+   ========================================================================== */
+
+.auth-gateway-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+}
+
+.auth-gateway-grid {
+  width: 100%;
+  max-width: 1120px;
+  display: grid;
+  grid-template-columns: 1fr 1.12fr;
+  gap: 2.2rem;
+  align-items: stretch;
+}
+
+.auth-hero-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.4rem;
+  border-top: 3px solid var(--mech-orange);
+}
+
+.hero-top-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--mech-orange);
+  margin-bottom: 1.1rem;
+}
+
+.hero-logo-pedestal {
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin-bottom: 1.4rem;
+}
+
+.hero-logo-pedestal img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.auth-hero-card h1 {
+  font-size: 2.05rem;
+  line-height: 1.15;
+  margin-bottom: 0.85rem;
+  color: var(--text-primary);
+}
+
+.auth-hero-card p {
+  font-size: 0.94rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.hero-specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.95rem;
+  margin-top: auto;
+}
+
+.hero-spec-item {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset-sm);
+  border-left: 3px solid var(--mech-orange);
+}
+
+.hero-spec-item.yellow {
+  border-left-color: var(--tech-yellow);
+}
+
+.hero-spec-item .spec-num {
+  font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
+  font-size: 1.22rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hero-spec-item .spec-txt {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+/* Tarjeta Derecha de Autenticación con 3 Apartados Separados */
+.auth-box-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 2.2rem;
+}
+
+/* Selector Principal: 1) Alumnos | 2) Profesores | 3) Coordinador */
+.role-tabs-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.45rem;
+  padding: 0.45rem;
+  background: var(--bg-main);
+  border-radius: var(--radius-md);
+  box-shadow: var(--neu-inset);
+  margin-bottom: 1.45rem;
+}
+
+.role-tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.72rem 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.role-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.role-tab-btn.active {
+  background: var(--bg-surface);
+  color: var(--mech-orange);
+  border-color: var(--border-tech);
+  box-shadow: var(--neu-extruded-sm);
+}
+
+/* Sub-selector Interno: Iniciar Sesión vs. Registrarse por 1ra vez */
+.sub-auth-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  padding: 0.35rem;
+  background: var(--bg-main);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neu-inset-sm);
+  margin-bottom: 1.35rem;
+}
+
+.sub-auth-btn {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.sub-auth-btn.active {
+  background: var(--bg-surface);
+  color: var(--tech-yellow);
+  box-shadow: var(--neu-extruded-sm);
+}
+
+/* Alerta de Standby */
+.standby-banner {
+  background: rgba(250, 204, 21, 0.08);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-left: 4px solid var(--tech-yellow);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.2rem;
+  color: var(--text-primary);
+  font-size: 0.86rem;
+}
+
+/* ==========================================================================
+   PANTALLA 2: WORKSPACE CON SIDEBAR LATERAL IZQUIERDA
+   ========================================================================== */
+
+.workspace-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 295px 1fr;
+  gap: 1.85rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  align-items: start;
+}
+
+.sidebar-nav {
+  position: sticky;
+  top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  min-height: calc(100vh - 3rem);
+  justify-content: space-between;
+  border-top: 3px solid var(--mech-orange);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sidebar-logo-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset-sm);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-logo-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.sidebar-user-card {
+  padding: 1.05rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset);
+}
+
+.user-role-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 0.5rem;
+}
+
+.user-role-tag.alumno {
+  background: var(--electro-cyan-soft);
+  color: var(--electro-cyan);
+}
+
+.user-role-tag.profesor {
+  background: var(--alimentos-emerald-soft);
+  color: var(--alimentos-emerald);
+}
+
+.user-role-tag.coordinador {
+  background: var(--mech-orange-soft);
+  color: var(--mech-orange);
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.sidebar-link {
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  transition: var(--transition);
+  text-align: left;
+}
+
+.sidebar-link:hover {
+  color: var(--text-primary);
+  box-shadow: var(--neu-extruded-sm);
+}
+
+.sidebar-link.active {
+  background: var(--bg-main);
+  color: var(--mech-orange);
+  box-shadow: var(--neu-inset-sm);
+  border-color: var(--border-tech);
+}
+
+.standby-count-badge {
+  background: var(--tech-yellow);
+  color: #111317;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.workspace-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  min-width: 0;
+}
+
+.workspace-header-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   VISTA PERSONAL DEL ALUMNO ("MI PANEL DE ALUMNO")
+   ========================================================================== */
+
+.student-personal-grid {
+  display: grid;
+  grid-template-columns: 390px 1fr;
+  gap: 1.65rem;
+  align-items: start;
+}
+
+.dial-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0.8rem 0;
+}
+
+.neu-dial-outer {
+  width: 224px;
+  height: 224px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  box-shadow: var(--neu-extruded);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.neu-dial-inner-well {
+  width: 178px;
+  height: 178px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.neu-dial-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 224px;
+  height: 224px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.neu-dial-svg circle {
+  fill: none;
+  stroke-width: 13;
+  stroke-linecap: round;
+}
+
+.neu-dial-svg .dial-progress {
+  stroke: var(--mech-orange);
+  transition: stroke-dashoffset 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0px 0px 8px rgba(255, 77, 45, 0.5));
+}
+
+.neu-dial-svg .dial-progress.completed {
+  stroke: var(--alimentos-emerald);
+  filter: drop-shadow(0px 0px 10px rgba(16, 185, 129, 0.6));
+}
+
+.neu-dial-center {
+  width: 138px;
+  height: 138px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  box-shadow: var(--neu-extruded-sm);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 2;
+  padding: 0.6rem;
+}
+
+.dial-hours-big {
+  font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
+  font-size: 2.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.dial-hours-total {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.neu-progress-track {
+  width: 100%;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset-sm);
+  padding: 3px;
+  overflow: hidden;
+}
+
+.neu-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  background: linear-gradient(90deg, #ff4d2d, #facc15);
+}
+
+.neu-progress-fill.completed {
+  background: linear-gradient(90deg, #059669, #10b981, #34d399);
+}
+
+/* Badges de Orientación y Año */
+.orientation-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-pill);
+  background: var(--bg-main);
+  box-shadow: var(--neu-extruded-sm);
+  border: 1px solid var(--border-subtle);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.orientation-badge.electromecanica {
+  color: var(--electro-cyan);
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+.orientation-badge.alimentacion {
+  color: var(--alimentos-emerald);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.year-tag {
+  font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.28rem 0.7rem;
+  border-radius: 8px;
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset-sm);
+  color: var(--tech-yellow);
+}
+
+/* Lista de Prácticas / Historial */
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.log-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.05rem 1.2rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-main);
+  box-shadow: var(--neu-extruded-sm);
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--mech-orange);
+}
+
+.log-item.alimentacion {
+  border-left-color: var(--alimentos-emerald);
+}
+
+.log-item.standby {
+  border-left-color: var(--tech-yellow);
+  background: rgba(250, 204, 21, 0.04);
+}
+
+.log-item-hours {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--mech-orange);
+  background: var(--bg-surface);
+  box-shadow: var(--neu-inset-sm);
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   BUSCADOR DE ALUMNOS DEL PROFESOR
+   ========================================================================== */
+
+.teacher-search-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 1rem;
+  margin-top: 1.1rem;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 0.35rem;
+}
+
+.student-search-card {
+  padding: 1.05rem 1.15rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-main);
+  box-shadow: var(--neu-extruded-sm);
+  border: 1.5px solid var(--border-subtle);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.student-search-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 77, 45, 0.4);
+}
+
+.student-search-card.selected {
+  box-shadow: var(--neu-inset);
+  border-color: var(--mech-orange);
+}
+
+/* ==========================================================================
+   MODAL DEL CERTIFICADO Y NOTIFICACIONES
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 9, 12, 0.78);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 1000;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 860px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.65);
+  padding: 1.75rem;
+}
+
+.certificate-paper {
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 12px;
+  padding: 2.2rem 2.5rem;
+  border: 3px double #b91c1c;
+  box-shadow: inset 0 0 0 6px #fff, inset 0 0 0 8px #1e3a8a;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  margin: 1rem 0 1.4rem;
+}
+
+.cert-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #cbd5e1;
+  padding-bottom: 1rem;
+  margin-bottom: 1.35rem;
+  gap: 1rem;
+}
+
+.cert-header img {
+  width: 92px;
+  height: auto;
+}
+
+.cert-signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.cert-sig-line {
+  border-top: 1px solid #64748b;
+  padding-top: 0.45rem;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 1.6rem;
+  right: 1.6rem;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.neu-toast {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: var(--neu-extruded);
+  border: 1px solid var(--border-subtle);
+  border-left: 5px solid var(--mech-orange);
+  border-radius: var(--radius-md);
+  padding: 0.95rem 1.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  animation: slideIn 0.3s ease;
+}
+
+.neu-toast.success {
+  border-left-color: var(--alimentos-emerald);
+}
+
+.neu-toast.error {
+  border-left-color: var(--danger-crimson);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 1024px) {
+  .auth-gateway-grid,
+  .workspace-shell,
+  .student-personal-grid {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-nav {
+    position: static;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-row-2,
+  .hero-specs-grid,
+  .role-tabs-bar,
+  .cert-signatures {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E.P.E.T. N° 4 Junín de los Andes | Prácticas Profesionalizantes</title>
+  <!-- Google Fonts: Space Grotesk + JetBrains Mono + DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@500;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Estilos Neumórficos Grafito Carbono & Naranja/Amarillo Industrial -->
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- jsPDF para generar el Certificado PDF Oficial listo para imprimir -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ======================================================================
+       PANTALLA 1: PORTAL DE ACCESO CON LOS 3 APARTADOS SEPARADOS Y SEGURIDAD
+       ====================================================================== -->
+  <div id="authGatewayScreen" class="auth-gateway-wrapper">
+    <div class="auth-gateway-grid">
+
+      <!-- Columna Izquierda: Identidad Técnica E.P.E.T. N° 4 -->
+      <section class="neu-card auth-hero-card">
+        <div>
+          <span class="hero-top-badge">
+            <span>●</span> E.P.E.T. N° 4 "Gendarmería Nacional" • Junín de los Andes
+          </span>
+
+          <div class="hero-logo-pedestal">
+            <img class="epet-logo-img" src="logo_epet4.png" alt="Logo Oficial E.P.E.T. N° 4" />
+          </div>
+
+          <h1>Control de Prácticas Profesionalizantes</h1>
+          <p>
+            Plataforma oficial de seguimiento de horas y certificación técnica para el <strong>Ciclo Superior (4°, 5° y 6° Año)</strong>.
+            Cada alumno y profesor cuenta con acceso protegido por correo Gmail y contraseña personal.
+          </p>
+        </div>
+
+        <div class="hero-specs-grid">
+          <div class="hero-spec-item">
+            <div class="spec-num">200 HS RELOJ</div>
+            <div class="spec-txt">Meta obligatoria para habilitar la descarga del Certificado PDF listo para imprimir.</div>
+          </div>
+          <div class="hero-spec-item yellow">
+            <div class="spec-num">2 ORIENTACIONES</div>
+            <div class="spec-txt">⚙️ Electromecánica y 🧪 Ciencias de la Alimentación (4° a 6° Año).</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Columna Derecha: Apartados Separados (Alumnos | Profesores | Coordinador) -->
+      <section class="neu-card auth-box-card">
+
+        <!-- Barra de Selección de Rol -->
+        <div class="role-tabs-bar">
+          <button
+            type="button"
+            class="role-tab-btn active"
+            id="roleTabBtnAlumno"
+            onclick="switchAuthRoleTab('alumno')"
+          >
+            🎓 Alumnos
+          </button>
+          <button
+            type="button"
+            class="role-tab-btn"
+            id="roleTabBtnProfesor"
+            onclick="switchAuthRoleTab('profesor')"
+          >
+            👨‍🏫 Profesores
+          </button>
+          <button
+            type="button"
+            class="role-tab-btn"
+            id="roleTabBtnCoordinador"
+            onclick="switchAuthRoleTab('coordinador')"
+          >
+            🛡️ Coordinador
+          </button>
+        </div>
+
+        <!-- ================================================================
+             APARTADO A: ALUMNOS (INICIAR SESIÓN / REGISTRARSE POR 1RA VEZ)
+             ================================================================ -->
+        <div id="authSectionAlumno">
+          <div class="sub-auth-toggle">
+            <button
+              type="button"
+              class="sub-auth-btn active"
+              id="btnSubAlumnoLogin"
+              onclick="switchStudentAuthMode('login')"
+            >
+              Iniciar Sesión
+            </button>
+            <button
+              type="button"
+              class="sub-auth-btn"
+              id="btnSubAlumnoRegister"
+              onclick="switchStudentAuthMode('register')"
+            >
+              Registrarme (1ra vez)
+            </button>
+          </div>
+
+          <!-- A1: Login de Alumno con Gmail + Contraseña -->
+          <div id="boxStudentLogin">
+            <h2 style="font-size: 1.4rem; margin-bottom: 0.3rem;">Ingreso de Alumno</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.2rem;">
+              Ingresá con tu cuenta Gmail registrada y tu contraseña personal para ver tus horas y descargar tu certificado.
+            </p>
+
+            <form onsubmit="handleStudentLoginSubmit(event)">
+              <div class="form-group">
+                <label class="form-label" for="stuLoginEmail">Correo Gmail del Alumno *</label>
+                <input
+                  type="email"
+                  id="stuLoginEmail"
+                  class="neu-input"
+                  placeholder="alumno@gmail.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="stuLoginPass">Contraseña *</label>
+                <input
+                  type="password"
+                  id="stuLoginPass"
+                  class="neu-input"
+                  placeholder="Ingresá tu contraseña"
+                  required
+                />
+              </div>
+
+              <button type="submit" class="neu-btn neu-btn-primary" style="width: 100%; padding: 0.95rem;">
+                Ingresar a Mi Panel de Alumno →
+              </button>
+            </form>
+          </div>
+
+          <!-- A2: Registro de Alumno por 1ra vez (Pide Gmail, Contraseña, Nombre y Apellido, DNI, Orientación y Año) -->
+          <div id="boxStudentRegister" style="display: none;">
+            <h2 style="font-size: 1.35rem; margin-bottom: 0.25rem;">Registro de Alumno (1ra Vez)</h2>
+            <p style="font-size: 0.83rem; color: var(--text-secondary); margin-bottom: 1.1rem;">
+              Creá tu cuenta con contraseña. Si el Coordinador ya te había cargado por DNI, tus horas previas se vincularán automáticamente.
+            </p>
+
+            <form onsubmit="handleStudentRegisterSubmit(event)">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="stuRegName">Nombre y Apellido *</label>
+                  <input
+                    type="text"
+                    id="stuRegName"
+                    class="neu-input"
+                    placeholder="Ej: Mateo Cañicul"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="stuRegDni">DNI (sin puntos) *</label>
+                  <input
+                    type="text"
+                    id="stuRegDni"
+                    class="neu-input font-mono"
+                    placeholder="Ej: 46812309"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="stuRegEmail">Tu Correo Gmail *</label>
+                <input
+                  type="email"
+                  id="stuRegEmail"
+                  class="neu-input"
+                  placeholder="tu.correo@gmail.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="stuRegOrientation">Orientación Técnica *</label>
+                <select id="stuRegOrientation" class="neu-select" required>
+                  <option value="Electromecánica">⚙️ Electromecánica</option>
+                  <option value="Ciencias de la Alimentación">🧪 Ciencias de la Alimentación</option>
+                </select>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="stuRegYear">Año Ciclo Superior *</label>
+                  <select id="stuRegYear" class="neu-select" required>
+                    <option value="4° Año">4° Año</option>
+                    <option value="5° Año">5° Año</option>
+                    <option value="6° Año" selected>6° Año</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="stuRegDivision">División de Curso *</label>
+                  <select id="stuRegDivision" class="neu-select" required>
+                    <option value="A">División A</option>
+                    <option value="B">División B</option>
+                    <option value="C">División C</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="stuRegPass">Crear Contraseña *</label>
+                  <input
+                    type="password"
+                    id="stuRegPass"
+                    class="neu-input"
+                    minlength="4"
+                    placeholder="Mínimo 4 caracteres"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="stuRegPassConfirm">Repetir Contraseña *</label>
+                  <input
+                    type="password"
+                    id="stuRegPassConfirm"
+                    class="neu-input"
+                    minlength="4"
+                    placeholder="Confirmar contraseña"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" class="neu-btn neu-btn-primary" style="width: 100%; padding: 0.95rem;">
+                Completar Registro e Ingresar →
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             APARTADO B: PROFESORES (MISMO FORMATO: LOGIN / REGISTRO EN STANDBY)
+             ================================================================ -->
+        <div id="authSectionProfesor" style="display: none;">
+          <div class="sub-auth-toggle">
+            <button
+              type="button"
+              class="sub-auth-btn active"
+              id="btnSubProfLogin"
+              onclick="switchTeacherAuthMode('login')"
+            >
+              Iniciar Sesión
+            </button>
+            <button
+              type="button"
+              class="sub-auth-btn"
+              id="btnSubProfRegister"
+              onclick="switchTeacherAuthMode('register')"
+            >
+              Registrarme como Profesor
+            </button>
+          </div>
+
+          <!-- Aviso dinámico si el profesor está en Standby esperando confirmación del Coordinador -->
+          <div id="profStandbyNoticeBox" class="standby-banner" style="display: none;"></div>
+
+          <!-- B1: Login de Profesor con Gmail + Contraseña -->
+          <div id="boxTeacherLogin">
+            <h2 style="font-size: 1.4rem; margin-bottom: 0.3rem;">Ingreso de Profesor</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.2rem;">
+              Ingresá con tu Gmail y tu contraseña docente. Para poder acceder, tu cuenta debe estar confirmada por el Coordinador.
+            </p>
+
+            <form onsubmit="handleTeacherLoginSubmit(event)">
+              <div class="form-group">
+                <label class="form-label" for="profLoginEmail">Correo Gmail del Profesor *</label>
+                <input
+                  type="email"
+                  id="profLoginEmail"
+                  class="neu-input"
+                  placeholder="profesor@gmail.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profLoginPass">Contraseña *</label>
+                <input
+                  type="password"
+                  id="profLoginPass"
+                  class="neu-input"
+                  placeholder="Ingresá tu contraseña docente"
+                  required
+                />
+              </div>
+
+              <button type="submit" class="neu-btn neu-btn-primary" style="width: 100%; padding: 0.95rem;">
+                Ingresar al Panel de Profesores →
+              </button>
+            </form>
+          </div>
+
+          <!-- B2: Registro de Nuevo Profesor (Queda en Standby hasta que el Coordinador lo confirme) -->
+          <div id="boxTeacherRegister" style="display: none;">
+            <h2 style="font-size: 1.35rem; margin-bottom: 0.25rem;">Registro de Nuevo Profesor</h2>
+            <p style="font-size: 0.83rem; color: var(--text-secondary); margin-bottom: 1.1rem;">
+              Registrá tu Gmail y creá tu contraseña. Tu cuenta quedará en <strong>Standby (Pendiente)</strong> hasta que el Coordinador/Director confirme en su panel que sos docente de la institución.
+            </p>
+
+            <form onsubmit="handleTeacherRegisterSubmit(event)">
+              <div class="form-group">
+                <label class="form-label" for="profRegName">Nombre y Apellido del Profesor/a *</label>
+                <input
+                  type="text"
+                  id="profRegName"
+                  class="neu-input"
+                  placeholder="Ej: Ing. Marcos Riquelme"
+                  required
+                />
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="profRegEmail">Tu Correo Gmail *</label>
+                  <input
+                    type="email"
+                    id="profRegEmail"
+                    class="neu-input"
+                    placeholder="profesor@gmail.com"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profRegOrientation">Orientación / Departamento *</label>
+                  <select id="profRegOrientation" class="neu-select" required>
+                    <option value="Electromecánica">⚙️ Electromecánica</option>
+                    <option value="Ciencias de la Alimentación">🧪 Ciencias de la Alimentación</option>
+                    <option value="Ambas Orientaciones">Ambas Orientaciones</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="profRegPass">Crear Contraseña *</label>
+                  <input
+                    type="password"
+                    id="profRegPass"
+                    class="neu-input"
+                    minlength="4"
+                    placeholder="Mínimo 4 caracteres"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profRegPassConfirm">Repetir Contraseña *</label>
+                  <input
+                    type="password"
+                    id="profRegPassConfirm"
+                    class="neu-input"
+                    minlength="4"
+                    placeholder="Confirmar contraseña"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" class="neu-btn neu-btn-yellow" style="width: 100%; padding: 0.95rem;">
+                Enviar Solicitud de Registro Docente (Standby) →
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             APARTADO C: COORDINADOR / DIRECTOR (USUARIO Y CONTRASEÑA SIN PISTAS)
+             ================================================================ -->
+        <div id="authSectionCoordinador" style="display: none;">
+          <span class="hero-top-badge" style="margin-bottom: 0.35rem;">
+            DIRECCIÓN Y COORDINACIÓN GENERAL • E.P.E.T. N° 4
+          </span>
+          <h2 style="font-size: 1.4rem; margin-bottom: 0.35rem;">Acceso Coordinador / Director</h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+            Ingresá tu usuario y contraseña de Coordinación para confirmar profesores en Standby, administrar permisos o registrar alumnos manualmente.
+          </p>
+
+          <form onsubmit="handleCoordinatorLoginSubmit(event)">
+            <div class="form-group">
+              <label class="form-label" for="coordUserInput">Usuario *</label>
+              <input
+                type="text"
+                id="coordUserInput"
+                class="neu-input"
+                placeholder="Ingresá tu usuario de coordinación"
+                autocomplete="off"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="coordPassInput">Contraseña *</label>
+              <input
+                type="password"
+                id="coordPassInput"
+                class="neu-input"
+                placeholder="Ingresá tu contraseña"
+                autocomplete="off"
+                required
+              />
+            </div>
+
+            <button type="submit" class="neu-btn neu-btn-primary" style="width: 100%; padding: 0.95rem;">
+              Ingresar al Panel de Coordinación →
+            </button>
+          </form>
+        </div>
+
+      </section>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       PANTALLA 2: WORKSPACE CON SIDEBAR LATERAL IZQUIERDA (SEGÚN ROL ACTIVO)
+       ====================================================================== -->
+  <div id="workspaceScreen" class="workspace-shell" style="display: none;">
+
+    <!-- SIDEBAR LATERAL IZQUIERDA -->
+    <aside class="neu-card sidebar-nav">
+      <div>
+        <div class="sidebar-brand">
+          <div class="sidebar-logo-box">
+            <img class="epet-logo-img" src="logo_epet4.png" alt="Escudo EPET 4" />
+          </div>
+          <div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 700; color: var(--mech-orange); letter-spacing: 0.07em;">
+              JUNÍN DE LOS ANDES
+            </div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.08rem; font-weight: 700; line-height: 1.15;">
+              E.P.E.T. N° 4
+            </div>
+            <div style="font-size: 0.76rem; color: var(--text-secondary);">
+              Prácticas Profesionalizantes
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta del Usuario Conectado -->
+        <div class="sidebar-user-card" style="margin: 1.2rem 0;" id="sidebarUserCard"></div>
+
+        <!-- Menú Contextual según el Rol -->
+        <nav class="sidebar-menu" id="sidebarMenuContainer"></nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <button type="button" class="neu-btn neu-btn-danger" style="width: 100%; justify-content: flex-start;" onclick="logoutSession()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar Sesión / Salir
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO DINÁMICO DEL PANEL CORRESPONDIENTE AL USUARIO -->
+    <main class="workspace-main" id="workspaceMainContainer"></main>
+
+  </div>
+
+  <!-- ======================================================================
+       MODAL DE VISTA PREVIA DEL CERTIFICADO OFICIAL DE 200 HORAS
+       ====================================================================== -->
+  <div id="certificatePreviewModal" class="modal-backdrop" onclick="if(event.target===this) closeCertificateModal()">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <div>
+          <span class="hero-top-badge" style="color: var(--alimentos-emerald); margin-bottom: 0.2rem;">
+            CERTIFICACIÓN OFICIAL • 200 HORAS CUMPLIDAS
+          </span>
+          <h3 style="font-size: 1.25rem;">Certificado de Prácticas Profesionalizantes</h3>
+        </div>
+        <div style="display: flex; gap: 0.65rem;">
+          <button type="button" class="neu-btn neu-btn-success" id="btnModalDownloadPdf">
+            Descargar PDF Listo para Imprimir
+          </button>
+          <button type="button" class="neu-btn" onclick="closeCertificateModal()">Cerrar</button>
+        </div>
+      </div>
+
+      <div id="certificatePreviewPaper" class="certificate-paper"></div>
+    </div>
+  </div>
+
+  <!-- Contenedor de Notificaciones -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/logo-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
