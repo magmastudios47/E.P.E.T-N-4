@@ -2,6 +2,7 @@
   "name": "epet4-practicas-profesionalizantes",
   "version": "1.0.0",
   "description": "Sistema de gestión y certificación de 200 horas de Prácticas Profesionalizantes — E.P.E.T. N° 4 Junín de los Andes",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   }

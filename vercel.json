@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "server.js": {
+      "includeFiles": "{index.html,logo_epet4.png,css/**,js/**}"
+    }
+  }
+}

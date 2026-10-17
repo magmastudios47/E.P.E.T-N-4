@@ -4,7 +4,18 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const ROOT_DIR = __dirname;
-const DB_PATH = path.join(ROOT_DIR, 'data', 'db.json');
+const DB_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'epet4_db.json')
+  : path.join(ROOT_DIR, 'data', 'db.json');
+
+// Referencias explícitas para que el empaquetador de Vercel (@vercel/nft) incluya todos los archivos estáticos
+const BUNDLED_ASSETS = [
+  path.join(__dirname, 'index.html'),
+  path.join(__dirname, 'logo_epet4.png'),
+  path.join(__dirname, 'css', 'styles.css'),
+  path.join(__dirname, 'js', 'app.js'),
+  path.join(__dirname, 'js', 'logo-data.js')
+];
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -25,7 +36,7 @@ function readDb() {
       return JSON.parse(raw);
     }
   } catch (err) {
-    console.error('Error leyendo data/db.json:', err.message);
+    console.error('Error leyendo base de datos:', err.message);
   }
   return null;
 }
@@ -36,13 +47,13 @@ function writeDb(data) {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf8');
     return true;
   } catch (err) {
-    console.error('Error guardando data/db.json:', err.message);
+    console.error('Error guardando base de datos:', err.message);
     return false;
   }
 }
 
 const server = http.createServer((req, res) => {
-  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = parsedUrl.pathname;
 
   // Endpoint API de persistencia para la escuela
@@ -79,11 +90,11 @@ const server = http.createServer((req, res) => {
   }
 
   // Servir archivos estáticos
-  let safePath = path.normalize(pathname === '/' ? '/index.html' : pathname);
-  safePath = safePath.replace(/^(\.\.[\/\\])+/, '');
+  let cleanPathname = pathname === '/' ? '/index.html' : pathname;
+  let safePath = path.normalize(cleanPathname).replace(/^(\.\.[\/\\])+/, '').replace(/^[\/\\]+/, '');
   const filePath = path.join(ROOT_DIR, safePath);
 
-  if (!filePath.startsWith(ROOT_DIR)) {
+  if (!filePath.startsWith(ROOT_DIR) && !BUNDLED_ASSETS.includes(filePath)) {
     res.writeHead(403);
     return res.end('Acceso denegado');
   }
