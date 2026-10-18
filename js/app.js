@@ -2872,7 +2872,7 @@ function initPwaSupport() {
     deferredPwaPrompt = e;
     const btnText = document.getElementById('btnInstallPwaText');
     if (btnText) {
-      btnText.textContent = 'Descargar Aplicación (Instalar Ahora)';
+      btnText.textContent = 'Descargar Aplicación';
     }
   });
 
