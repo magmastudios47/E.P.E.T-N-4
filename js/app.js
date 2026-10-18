@@ -39,6 +39,7 @@ let coordStudentSearchQuery = '';
 let coordStudentOriFilter = 'ALL';
 let coordStudentYearFilter = 'ALL';
 let coordStudentDivFilter = 'ALL';
+let coordEditingPassStudentId = null;
 
 // Estado del buscador en el Historial General del Coordinador
 let coordLogSearchQuery = '';
@@ -1978,40 +1979,152 @@ function renderCoordinatorStudentsList() {
     .map((stu) => {
       const hrs = getStudentTotalHours(stu);
       const completed = hrs >= REQUIRED_HOURS;
+      const isEditingPass = coordEditingPassStudentId === stu.id;
+
       return `
-        <div class="log-item ${stu.orientation === 'Electromecánica' ? '' : 'alimentacion'}">
-          <div>
-            <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.98rem;">
-              ${escapeHtml(stu.name)} — <span class="font-mono">DNI ${formatDni(stu.dni)}</span>
-            </div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem;">
-              <strong>${escapeHtml(formatCourseLabel(stu))}</strong> • ${escapeHtml(stu.orientation)} • Gmail: <strong>${escapeHtml(
+        <div class="log-item ${stu.orientation === 'Electromecánica' ? '' : 'alimentacion'}" style="flex-direction: column; align-items: stretch;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; width: 100%; flex-wrap: wrap;">
+            <div>
+              <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.98rem;">
+                ${escapeHtml(stu.name)} — <span class="font-mono">DNI ${formatDni(stu.dni)}</span>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                <strong>${escapeHtml(formatCourseLabel(stu))}</strong> • ${escapeHtml(stu.orientation)} • Gmail: <strong>${escapeHtml(
         stu.email || 'Pendiente de vincular por el alumno'
       )}</strong>
+              </div>
+              <div style="margin-top: 0.3rem;">
+                <span class="year-tag" style="color: ${stu.password ? 'var(--alimentos-emerald)' : 'var(--tech-yellow)'};">
+                  ${stu.password ? '🔐 Con contraseña activa' : '⏳ Sin contraseña (el alumno creará una nueva en "Registrarme")'}
+                </span>
+              </div>
             </div>
-            <div style="margin-top: 0.25rem;">
-              <span class="year-tag" style="color: ${stu.password ? 'var(--alimentos-emerald)' : 'var(--tech-yellow)'};">
-                ${stu.password ? '🔐 Con contraseña activa' : '⏳ Sin contraseña aún (creará su clave al registrarse)'}
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.45rem;">
+              <span class="log-item-hours" style="color: ${completed ? 'var(--alimentos-emerald)' : 'var(--mech-orange)'};">
+                ${hrs} / 200 HS
               </span>
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-end;">
+                ${
+                  completed
+                    ? `<button type="button" class="neu-btn neu-btn-success" style="padding: 0.32rem 0.65rem; font-size: 0.74rem;" onclick="downloadCertificatePDF('${stu.id}')">PDF</button>`
+                    : ''
+                }
+                <button
+                  type="button"
+                  class="neu-btn ${isEditingPass ? 'active' : ''}"
+                  style="padding: 0.32rem 0.7rem; font-size: 0.74rem;"
+                  onclick="toggleCoordStudentPasswordBox('${stu.id}')"
+                >
+                  🔑 Contraseña
+                </button>
+                <button type="button" class="neu-btn neu-btn-danger" style="padding: 0.32rem 0.65rem; font-size: 0.74rem;" onclick="deleteStudentRecord('${stu.id}')">Borrar</button>
+              </div>
             </div>
           </div>
-          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.45rem;">
-            <span class="log-item-hours" style="color: ${completed ? 'var(--alimentos-emerald)' : 'var(--mech-orange)'};">
-              ${hrs} / 200 HS
-            </span>
-            <div style="display: flex; gap: 0.4rem;">
-              ${
-                completed
-                  ? `<button type="button" class="neu-btn neu-btn-success" style="padding: 0.3rem 0.65rem; font-size: 0.74rem;" onclick="downloadCertificatePDF('${stu.id}')">PDF</button>`
-                  : ''
-              }
-              <button type="button" class="neu-btn neu-btn-danger" style="padding: 0.3rem 0.65rem; font-size: 0.74rem;" onclick="deleteStudentRecord('${stu.id}')">Borrar</button>
-            </div>
-          </div>
+
+          ${
+            isEditingPass
+              ? `
+                <div class="neu-well-sm" style="margin-top: 0.85rem; border-left: 3px solid var(--mech-orange);">
+                  <div style="font-family: 'IBM Plex Sans', sans-serif; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--mech-orange); margin-bottom: 0.35rem;">
+                    🔑 Gestión de Contraseña de ${escapeHtml(stu.name)}
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                    Si el alumno olvidó su clave, podés <strong>asignarle una nueva aquí mismo</strong> o <strong>borrar su contraseña actual</strong> para que el alumno cree una nueva desde "Registrarme (1ra vez)" usando su DNI.
+                  </p>
+                  <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 210px;">
+                      <input
+                        type="password"
+                        id="coordNewPassInput_${stu.id}"
+                        class="neu-input"
+                        style="padding: 0.58rem 0.9rem; font-size: 0.86rem;"
+                        placeholder="Escribir nueva contraseña (mín. 4 caracteres)..."
+                        value="${escapeHtml(stu.password || '')}"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      class="neu-btn neu-btn-primary"
+                      style="padding: 0.58rem 0.95rem; font-size: 0.79rem;"
+                      onclick="saveStudentNewPasswordByCoord('${stu.id}')"
+                    >
+                      Guardar Nueva Clave
+                    </button>
+                    ${
+                      stu.password
+                        ? `
+                          <button
+                            type="button"
+                            class="neu-btn neu-btn-yellow"
+                            style="padding: 0.58rem 0.95rem; font-size: 0.79rem;"
+                            onclick="clearStudentPasswordByCoord('${stu.id}')"
+                          >
+                            Borrar Clave (El alumno crea una nueva)
+                          </button>
+                        `
+                        : ''
+                    }
+                    <button
+                      type="button"
+                      class="neu-btn"
+                      style="padding: 0.58rem 0.8rem; font-size: 0.79rem;"
+                      onclick="toggleCoordStudentPasswordBox(null)"
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              `
+              : ''
+          }
         </div>
       `;
     })
     .join('');
+
+  enhancePasswordInputs();
+}
+
+function toggleCoordStudentPasswordBox(studentId) {
+  coordEditingPassStudentId = coordEditingPassStudentId === studentId ? null : studentId;
+  renderCoordinatorStudentsList();
+}
+
+async function saveStudentNewPasswordByCoord(studentId) {
+  const inputEl = document.getElementById(`coordNewPassInput_${studentId}`);
+  if (!inputEl) return;
+  const newPass = inputEl.value;
+
+  if (!newPass || newPass.length < 4) {
+    showToast('La nueva contraseña debe tener al menos 4 caracteres.', 'error');
+    return;
+  }
+
+  await syncFromServerIfAvailable(true);
+  const stu = appState.students.find((s) => s.id === studentId);
+  if (!stu) return;
+
+  stu.password = newPass;
+  coordEditingPassStudentId = null;
+  await saveState(true);
+  renderCoordinatorStudentsList();
+  showToast(`Contraseña de ${stu.name} actualizada correctamente.`, 'success');
+}
+
+async function clearStudentPasswordByCoord(studentId) {
+  await syncFromServerIfAvailable(true);
+  const stu = appState.students.find((s) => s.id === studentId);
+  if (!stu) return;
+
+  stu.password = '';
+  coordEditingPassStudentId = null;
+  await saveState(true);
+  renderCoordinatorStudentsList();
+  showToast(
+    `Contraseña de ${stu.name} borrada. Ahora el alumno puede crear una nueva desde "Registrarme (1ra vez)" con su DNI.`,
+    'success'
+  );
 }
 
 // Funciones del Historial General de Cargas (Exclusivo Coordinador)

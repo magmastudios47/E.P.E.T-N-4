@@ -16,18 +16,18 @@
   --text-secondary: #5C3D28;
   --text-muted: #8C5C32;
 
-  /* Sombras Neumórficas Cálidas sobre #F2E9D8 */
-  --shadow-dark: #D3C5B0;
-  --shadow-light: #FFFDF8;
-  --border-subtle: rgba(140, 92, 50, 0.16);
-  --border-tech: rgba(166, 29, 0, 0.32);
+  /* Sombras Cálidas Institucionales (sin resplandor blanco superior/izquierdo) */
+  --shadow-dark: rgba(92, 61, 40, 0.14);
+  --shadow-light: transparent;
+  --border-subtle: rgba(140, 92, 50, 0.22);
+  --border-tech: rgba(166, 29, 0, 0.36);
 
-  /* Relieves Neumórficos Compuestos */
-  --neu-extruded: 9px 9px 18px var(--shadow-dark), -8px -8px 18px var(--shadow-light);
-  --neu-extruded-sm: 5px 5px 11px var(--shadow-dark), -5px -5px 11px var(--shadow-light);
-  --neu-extruded-lg: 14px 14px 28px var(--shadow-dark), -12px -12px 26px var(--shadow-light);
-  --neu-inset: inset 5px 5px 11px var(--shadow-dark), inset -5px -5px 11px var(--shadow-light);
-  --neu-inset-sm: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+  /* Sombras de Elevación y Profundidad Limpias */
+  --neu-extruded: 0 6px 18px rgba(92, 61, 40, 0.10), 0 2px 5px rgba(92, 61, 40, 0.06);
+  --neu-extruded-sm: 0 3px 9px rgba(92, 61, 40, 0.09), 0 1px 3px rgba(92, 61, 40, 0.05);
+  --neu-extruded-lg: 0 12px 28px rgba(92, 61, 40, 0.13), 0 4px 10px rgba(92, 61, 40, 0.07);
+  --neu-inset: inset 0 2px 5px rgba(92, 61, 40, 0.11);
+  --neu-inset-sm: inset 0 1px 3px rgba(92, 61, 40, 0.09);
 
   /* Paleta de Acentos (#A61D00, #8C5C32, #BD5B4F) */
   --mech-orange: #A61D00;
@@ -162,7 +162,7 @@ h1, h2, h3, h4, .font-display {
   transform: translateY(-2px);
   border-color: var(--border-tech);
   color: var(--mech-orange);
-  box-shadow: 7px 7px 15px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+  box-shadow: 0 6px 14px rgba(92, 61, 40, 0.13);
 }
 
 .neu-btn:active:not(:disabled),
@@ -182,20 +182,20 @@ h1, h2, h3, h4, .font-display {
   background: linear-gradient(135deg, #A61D00 0%, #BD5B4F 100%);
   color: #F2E9D8;
   border: 1px solid rgba(166, 29, 0, 0.3);
-  box-shadow: 5px 5px 14px var(--shadow-dark), -3px -3px 10px var(--shadow-light);
+  box-shadow: 0 4px 12px rgba(166, 29, 0, 0.22);
 }
 
 .neu-btn-primary:hover:not(:disabled) {
   color: #ffffff;
   filter: brightness(1.06);
-  box-shadow: 6px 6px 16px var(--shadow-dark), 0 4px 16px rgba(166, 29, 0, 0.25);
+  box-shadow: 0 6px 16px rgba(166, 29, 0, 0.30);
 }
 
 .neu-btn-yellow {
   background: linear-gradient(135deg, #8C5C32 0%, #BD5B4F 100%);
   color: #F2E9D8;
   border: none;
-  box-shadow: 5px 5px 14px var(--shadow-dark), -3px -3px 10px var(--shadow-light);
+  box-shadow: 0 4px 12px rgba(140, 92, 50, 0.22);
 }
 
 .neu-btn-yellow:hover:not(:disabled) {
@@ -237,13 +237,13 @@ h1, h2, h3, h4, .font-display {
   background: linear-gradient(135deg, #A61D00 0%, #8C5C32 100%);
   color: #F2E9D8;
   border: 1px solid rgba(166, 29, 0, 0.3);
-  box-shadow: 6px 6px 16px var(--shadow-dark), 0 4px 18px rgba(166, 29, 0, 0.28);
+  box-shadow: 0 5px 16px rgba(166, 29, 0, 0.26);
 }
 
 .neu-btn-certificate.unlocked:hover {
   color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 8px 8px 20px var(--shadow-dark), 0 6px 24px rgba(166, 29, 0, 0.38);
+  box-shadow: 0 8px 22px rgba(166, 29, 0, 0.35);
 }
 
 .neu-btn-certificate.locked {
