@@ -82,7 +82,7 @@ async function readDb() {
     try {
       await ensurePostgresTable();
       const rows = await neonSql`
-        SELECT state_json FROM epet4_app_state WHERE id = 'epet4_v4' LIMIT 1
+        SELECT state_json FROM epet4_app_state WHERE id = 'epet4_v5' LIMIT 1
       `;
       if (rows && rows.length > 0 && rows[0].state_json) {
         return typeof rows[0].state_json === 'string'
@@ -168,7 +168,7 @@ async function writeDb(data) {
       const jsonStr = JSON.stringify(finalState);
       await neonSql`
         INSERT INTO epet4_app_state (id, state_json, updated_at)
-        VALUES ('epet4_v4', ${jsonStr}::jsonb, NOW())
+        VALUES ('epet4_v5', ${jsonStr}::jsonb, NOW())
         ON CONFLICT (id) DO UPDATE
         SET state_json = EXCLUDED.state_json, updated_at = NOW()
       `;

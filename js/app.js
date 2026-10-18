@@ -8,184 +8,22 @@
    ========================================================================== */
 
 const REQUIRED_HOURS = 200;
-const STORAGE_KEY = 'epet4_practicas_db_v4';
-const SESSION_KEY = 'epet4_active_session_v4';
+const STORAGE_KEY = 'epet4_practicas_db_v5';
+const SESSION_KEY = 'epet4_active_session_v5';
 
 function getInitialState() {
   return {
     config: {
       schoolName: 'E.P.E.T. N° 4 "Gendarmería Nacional"',
       city: 'Junín de los Andes, Provincia del Neuquén',
-      directorName: 'Prof. Claudia Fuentes',
-      coordinatorName: 'Ing. Roberto Morales',
+      directorName: 'Dirección E.P.E.T. N° 4',
+      coordinatorName: 'Coordinación de Prácticas Profesionalizantes',
       resolution: 'Res. CPE Neuquén — Diseño Curricular Ciclo Superior Técnico (200 hs PP)',
       coordUsername: 'coordinador',
       coordPassword: 'epet4'
     },
-    teachers: [
-      {
-        id: 'prof-1',
-        email: 'prof.electromecanica.epet4@gmail.com',
-        password: 'epet4',
-        name: 'Téc. Alejandro Gómez',
-        orientation: 'Electromecánica',
-        status: 'active', // 'standby' | 'active' | 'preapproved' | 'suspended'
-        addedAt: '2026-03-10'
-      },
-      {
-        id: 'prof-2',
-        email: 'prof.alimentacion.epet4@gmail.com',
-        password: 'epet4',
-        name: 'Lic. Valeria Domínguez',
-        orientation: 'Ciencias de la Alimentación',
-        status: 'active',
-        addedAt: '2026-03-12'
-      },
-      {
-        id: 'prof-3',
-        email: 'marcos.riquelme.docente@gmail.com',
-        password: 'epet4',
-        name: 'Ing. Marcos Riquelme',
-        orientation: 'Electromecánica',
-        status: 'standby',
-        addedAt: '2026-10-16'
-      }
-    ],
-    students: [
-      {
-        id: 'stu-1',
-        email: 'mateo.canicul@gmail.com',
-        password: '1234',
-        name: 'Mateo Nicolás Cañicul',
-        dni: '46812309',
-        year: '6° Año',
-        division: 'A',
-        orientation: 'Electromecánica',
-        registeredAt: '2026-04-02',
-        logs: [
-          {
-            id: 'log-101',
-            date: '2026-05-18',
-            hours: 80,
-            place: 'EPEN — Servicio Eléctrico Junín de los Andes',
-            description: 'Mantenimiento preventivo de transformadores de distribución y relevamiento de líneas de baja y media tensión.',
-            teacherName: 'Téc. Alejandro Gómez',
-            teacherEmail: 'prof.electromecanica.epet4@gmail.com'
-          },
-          {
-            id: 'log-102',
-            date: '2026-08-22',
-            hours: 70,
-            place: 'Taller de Electromecánica E.P.E.T. N° 4',
-            description: 'Diseño y montaje de tableros de automatización con contactores, guardamotores y programación PLC.',
-            teacherName: 'Téc. Alejandro Gómez',
-            teacherEmail: 'prof.electromecanica.epet4@gmail.com'
-          },
-          {
-            id: 'log-103',
-            date: '2026-10-08',
-            hours: 50,
-            place: 'Planta Potabilizadora / Obras Públicas Municipal',
-            description: 'Diagnóstico y reparación de electrobombas centrífugas trifásicas y alineación de acoplamientos.',
-            teacherName: 'Téc. Alejandro Gómez',
-            teacherEmail: 'prof.electromecanica.epet4@gmail.com'
-          }
-        ]
-      },
-      {
-        id: 'stu-2',
-        email: 'sofia.millain@gmail.com',
-        password: '1234',
-        name: 'Sofía Valentina Millain',
-        dni: '46790445',
-        year: '6° Año',
-        division: 'B',
-        orientation: 'Ciencias de la Alimentación',
-        registeredAt: '2026-04-04',
-        logs: [
-          {
-            id: 'log-201',
-            date: '2026-05-25',
-            hours: 85,
-            place: 'Dirección de Bromatología Municipal — Junín de los Andes',
-            description: 'Análisis fisicoquímico y microbiológico de aguas y alimentos, auditoría de Buenas Prácticas de Manufactura (BPM).',
-            teacherName: 'Lic. Valeria Domínguez',
-            teacherEmail: 'prof.alimentacion.epet4@gmail.com'
-          },
-          {
-            id: 'log-202',
-            date: '2026-08-14',
-            hours: 75,
-            place: 'Planta Piloto de Alimentos E.P.E.T. N° 4',
-            description: 'Estandarización de procesos térmicos de pasteurización, control de pH y grados Brix en conservas regionales.',
-            teacherName: 'Lic. Valeria Domínguez',
-            teacherEmail: 'prof.alimentacion.epet4@gmail.com'
-          },
-          {
-            id: 'log-203',
-            date: '2026-10-04',
-            hours: 50,
-            place: 'Establecimiento Elaborador Regional de Truchas y Ahumados',
-            description: 'Implementación de POES, control de cadena de frío y rotulado nutricional reglamentario.',
-            teacherName: 'Lic. Valeria Domínguez',
-            teacherEmail: 'prof.alimentacion.epet4@gmail.com'
-          }
-        ]
-      },
-      {
-        id: 'stu-3',
-        email: 'lautaro.rios@gmail.com',
-        password: '1234',
-        name: 'Lautaro Ezequiel Ríos',
-        dni: '46945112',
-        year: '6° Año',
-        division: 'A',
-        orientation: 'Electromecánica',
-        registeredAt: '2026-04-10',
-        logs: [
-          {
-            id: 'log-301',
-            date: '2026-06-12',
-            hours: 95,
-            place: 'EPEN — Estación Transformadora Junín de los Andes',
-            description: 'Medición de puesta a tierra, termografía en seccionadores y asistencia técnica en maniobras.',
-            teacherName: 'Téc. Alejandro Gómez',
-            teacherEmail: 'prof.electromecanica.epet4@gmail.com'
-          },
-          {
-            id: 'log-302',
-            date: '2026-09-20',
-            hours: 90,
-            place: 'Taller de Mecanizado y Tornería E.P.E.T. N° 4',
-            description: 'Fabricación de ejes y bujes en torno paralelo y soldadura MIG/MAG.',
-            teacherName: 'Téc. Alejandro Gómez',
-            teacherEmail: 'prof.electromecanica.epet4@gmail.com'
-          }
-        ]
-      },
-      {
-        id: 'stu-4',
-        email: 'camila.aillapan@gmail.com',
-        password: '1234',
-        name: 'Camila Rocío Aillapan',
-        dni: '47012889',
-        year: '5° Año',
-        division: 'C',
-        orientation: 'Ciencias de la Alimentación',
-        registeredAt: '2026-04-15',
-        logs: [
-          {
-            id: 'log-401',
-            date: '2026-06-19',
-            hours: 120,
-            place: 'Laboratorio de Química y Microbiología E.P.E.T. N° 4',
-            description: 'Siembra en medios de cultivo selectivos, recuento de coliformes y determinación de acidez titulable en lácteos.',
-            teacherName: 'Lic. Valeria Domínguez',
-            teacherEmail: 'prof.alimentacion.epet4@gmail.com'
-          }
-        ]
-      }
-    ]
+    teachers: [],
+    students: []
   };
 }
 
@@ -671,7 +509,7 @@ async function handleTeacherLoginSubmit(e) {
     if (standbyBox) {
       standbyBox.style.display = 'block';
       standbyBox.innerHTML = `
-        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--tech-yellow); margin-bottom: 0.25rem;">
+        <div style="font-family: 'Merriweather', serif; font-weight: 700; color: var(--tech-yellow); margin-bottom: 0.25rem;">
           ⏳ CUENTA DOCENTE EN STANDBY (PENDIENTE DE CONFIRMACIÓN)
         </div>
         <div>
@@ -787,7 +625,7 @@ async function handleTeacherRegisterSubmit(e) {
   if (standbyBox) {
     standbyBox.style.display = 'block';
     standbyBox.innerHTML = `
-      <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--tech-yellow); margin-bottom: 0.25rem;">
+      <div style="font-family: 'Merriweather', serif; font-weight: 700; color: var(--tech-yellow); margin-bottom: 0.25rem;">
         ✓ SOLICITUD DOCENTE ENVIADA (EN STANDBY)
       </div>
       <div>
@@ -898,7 +736,7 @@ function renderSidebar() {
     const stu = appState.students.find((s) => s.id === currentSession.studentId);
     userCard.innerHTML = `
       <span class="user-role-tag alumno">🎓 Alumno Ciclo Superior</span>
-      <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1rem;">
+      <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 1rem;">
         ${escapeHtml(stu?.name || currentSession.name)}
       </div>
       <div class="font-mono" style="font-size: 0.78rem; color: var(--tech-yellow); margin-top: 0.2rem;">
@@ -922,7 +760,7 @@ function renderSidebar() {
     const myLogsCount = countTeacherLogs(currentSession.email);
     userCard.innerHTML = `
       <span class="user-role-tag profesor">👨‍🏫 Profesor Confirmado</span>
-      <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1rem;">
+      <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 1rem;">
         ${escapeHtml(teacher?.name || currentSession.name)}
       </div>
       <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -946,7 +784,7 @@ function renderSidebar() {
 
     userCard.innerHTML = `
       <span class="user-role-tag coordinador">🛡️ Coordinador / Director</span>
-      <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1rem;">
+      <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 1rem;">
         ${escapeHtml(appState.config.coordinatorName || 'Coordinación General')}
       </div>
       <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -1090,7 +928,7 @@ function renderStudentPersonalWorkspace() {
             (log) => `
           <div class="log-item ${isElectro ? '' : 'alimentacion'}">
             <div>
-              <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.98rem;">
+              <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.98rem;">
                 ${escapeHtml(log.place)}
               </div>
               <div style="font-size: 0.86rem; color: var(--text-secondary); margin-top: 0.2rem;">
@@ -1107,7 +945,7 @@ function renderStudentPersonalWorkspace() {
           .join('')
       : `
         <div class="neu-well" style="text-align: center; padding: 2.2rem;">
-          <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.02rem; color: var(--text-secondary);">
+          <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 1.02rem; color: var(--text-secondary);">
             Todavía no tenés horas de prácticas cargadas
           </div>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem;">
@@ -1160,7 +998,7 @@ function renderStudentPersonalWorkspace() {
               <div class="neu-dial-center">
                 <div class="dial-hours-big">${totalHours}</div>
                 <div class="dial-hours-total">DE ${REQUIRED_HOURS} HS</div>
-                <div style="margin-top: 0.3rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; color: ${
+                <div style="margin-top: 0.3rem; font-family: 'IBM Plex Sans', sans-serif; font-variant-numeric: tabular-nums; font-size: 0.78rem; font-weight: 700; color: ${
                   completed ? 'var(--alimentos-emerald)' : 'var(--mech-orange)'
                 };">
                   ${pct}% CUMPLIDO
@@ -1341,7 +1179,7 @@ function renderTeacherWorkspace() {
                     (item) => `
                   <div class="log-item ${item.orientation === 'Electromecánica' ? '' : 'alimentacion'}">
                     <div>
-                      <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700;">
+                      <div style="font-family: 'Merriweather', serif; font-weight: 700;">
                         ${escapeHtml(item.studentName)} — <span class="font-mono">DNI ${formatDni(item.studentDni)}</span>
                         <span style="font-weight: 500; color: var(--text-muted);">(${escapeHtml(item.courseLabel)} • ${item.orientation})</span>
                       </div>
@@ -1404,7 +1242,7 @@ function renderTeacherWorkspace() {
             type="text"
             id="teacherSearchInput"
             class="neu-input"
-            placeholder="Escribí apellido, nombre o DNI (ej: Cañicul, Ríos, 46945112)..."
+            placeholder="Escribí apellido, nombre o número de DNI del alumno..."
             value="${escapeHtml(teacherSearchQuery)}"
             oninput="handleTeacherSearchInput(this.value)"
           />
@@ -1476,7 +1314,7 @@ function renderTeacherSearchResults() {
           onclick="selectStudentForTeacher('${stu.id}')"
         >
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
-            <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.98rem;">
+            <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.98rem;">
               ${escapeHtml(stu.name)}
             </div>
             <span class="year-tag">${escapeHtml(formatCourseLabel(stu))}</span>
@@ -1774,12 +1612,12 @@ function renderCoordinatorWorkspace() {
           <form onsubmit="handleCoordinatorManualStudentSubmit(event)">
             <div class="form-group">
               <label class="form-label" for="manualStuName">Nombre y Apellido del Alumno *</label>
-              <input type="text" id="manualStuName" class="neu-input" placeholder="Ej: Valentín Nahuelpan" required />
+              <input type="text" id="manualStuName" class="neu-input" placeholder="Nombre y apellido completo" required />
             </div>
 
             <div class="form-group">
               <label class="form-label" for="manualStuDni">DNI (sin puntos) *</label>
-              <input type="text" id="manualStuDni" class="neu-input font-mono" placeholder="Ej: 47812903" required />
+              <input type="text" id="manualStuDni" class="neu-input font-mono" placeholder="Solo números (sin puntos)" required />
             </div>
 
             <div class="form-group">
@@ -1955,7 +1793,7 @@ function renderCoordinatorWorkspace() {
                    (t) => `
                    <div class="log-item standby" style="align-items: center;">
                      <div>
-                       <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.02rem; color: var(--tech-yellow);">
+                       <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 1.02rem; color: var(--tech-yellow);">
                          ${escapeHtml(t.name)} — ${escapeHtml(t.email)}
                        </div>
                        <div style="font-size: 0.83rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -2004,7 +1842,7 @@ function renderCoordinatorWorkspace() {
 
           <div class="form-group">
             <label class="form-label" for="coordAddProfName">Nombre y Apellido *</label>
-            <input type="text" id="coordAddProfName" class="neu-input" placeholder="Ej: Ing. Marcos Riquelme" required />
+            <input type="text" id="coordAddProfName" class="neu-input" placeholder="Nombre y apellido del docente" required />
           </div>
 
           <div class="form-group">
@@ -2045,7 +1883,7 @@ function renderCoordinatorWorkspace() {
               return `
                 <div class="log-item" style="align-items: center;">
                   <div>
-                    <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem;">
+                    <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.95rem;">
                       ${escapeHtml(t.name)} — ${escapeHtml(t.email)}
                     </div>
                     <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -2143,7 +1981,7 @@ function renderCoordinatorStudentsList() {
       return `
         <div class="log-item ${stu.orientation === 'Electromecánica' ? '' : 'alimentacion'}">
           <div>
-            <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.98rem;">
+            <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.98rem;">
               ${escapeHtml(stu.name)} — <span class="font-mono">DNI ${formatDni(stu.dni)}</span>
             </div>
             <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -2252,7 +2090,7 @@ function renderCoordinatorGeneralLogsList() {
       (item) => `
       <div class="log-item ${item.orientation === 'Electromecánica' ? '' : 'alimentacion'}">
         <div>
-          <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700;">
+          <div style="font-family: 'Merriweather', serif; font-weight: 700;">
             ${escapeHtml(item.studentName)} — <span class="font-mono">DNI ${formatDni(item.studentDni)}</span>
             <span style="font-weight: 500; color: var(--text-muted);">(${escapeHtml(item.courseLabel)} • ${escapeHtml(item.orientation)})</span>
           </div>
@@ -2444,7 +2282,7 @@ function openCertificatePreviewModal(studentId) {
     <div class="cert-header">
       <img src="${logoSrc}" alt="Escudo EPET N° 4" />
       <div style="text-align: center; flex: 1;">
-        <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #475569;">
+        <h4 style="font-family: 'Merriweather', serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #475569;">
           Provincia del Neuquén • Consejo Provincial de Educación
         </h4>
         <h2 style="font-size: 1.35rem; color: #0f172a; margin: 0.25rem 0;">
@@ -2454,7 +2292,7 @@ function openCertificatePreviewModal(studentId) {
           Junín de los Andes — Ciclo Superior de Educación Secundaria Técnica
         </div>
       </div>
-      <div style="text-align: right; font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; color: #475569;">
+      <div style="text-align: right; font-family: 'Merriweather', serif; font-size: 0.72rem; color: #475569;">
         <div><strong>CÓDIGO:</strong> ${code}</div>
         <div><strong>ESTADO:</strong> APROBADO</div>
         <div><strong>HORAS:</strong> ${totalHours} HS RELOJ</div>
@@ -2462,7 +2300,7 @@ function openCertificatePreviewModal(studentId) {
     </div>
 
     <div style="text-align: center; line-height: 1.75; font-size: 1.02rem;">
-      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 0.84rem; font-weight: 700; letter-spacing: 0.12em; color: #b91c1c; text-transform: uppercase;">
+      <div style="font-family: 'Merriweather', serif; font-size: 0.84rem; font-weight: 700; letter-spacing: 0.12em; color: #b91c1c; text-transform: uppercase;">
         Certificado Oficial de Acreditación de Prácticas Profesionalizantes
       </div>
 
