@@ -707,6 +707,7 @@ function renderApp() {
     authScreen.style.display = 'flex';
     workspaceScreen.style.display = 'none';
     enhancePasswordInputs();
+    updatePwaUiVisibility();
     return;
   }
 
@@ -724,6 +725,7 @@ function renderApp() {
   }
 
   enhancePasswordInputs();
+  updatePwaUiVisibility();
 }
 
 // ==========================================================================
@@ -2858,14 +2860,28 @@ let deferredPwaPrompt = null;
 function isRunningStandalonePwa() {
   return (
     window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
+    window.matchMedia('(display-mode: fullscreen)').matches ||
+    window.navigator.standalone === true ||
+    localStorage.getItem('epet4_pwa_installed') === 'true'
   );
+}
+
+function updatePwaUiVisibility() {
+  if (isRunningStandalonePwa()) {
+    const topBanner = document.getElementById('pwaTopInstallBanner');
+    if (topBanner) topBanner.style.display = 'none';
+
+    const sidebarBtn = document.getElementById('btnInstallPwaSidebar');
+    if (sidebarBtn) sidebarBtn.style.display = 'none';
+  }
 }
 
 function initPwaSupport() {
   if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
+
+  updatePwaUiVisibility();
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -2878,8 +2894,15 @@ function initPwaSupport() {
 
   window.addEventListener('appinstalled', () => {
     deferredPwaPrompt = null;
+    localStorage.setItem('epet4_pwa_installed', 'true');
+    updatePwaUiVisibility();
     closePwaInstallModal();
     showToast('¡Aplicación oficial E.P.E.T. N° 4 instalada correctamente!', 'success');
+  });
+
+  // Escuchar si la ventana cambia a modo standalone
+  window.matchMedia('(display-mode: standalone)').addEventListener('change', () => {
+    updatePwaUiVisibility();
   });
 }
 
