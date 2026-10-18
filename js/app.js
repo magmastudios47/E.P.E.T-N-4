@@ -40,6 +40,7 @@ let coordStudentOriFilter = 'ALL';
 let coordStudentYearFilter = 'ALL';
 let coordStudentDivFilter = 'ALL';
 let coordEditingPassStudentId = null;
+let coordEditingPassTeacherId = null;
 
 // Estado del buscador en el Historial General del Coordinador
 let coordLogSearchQuery = '';
@@ -1234,7 +1235,7 @@ function renderTeacherWorkspace() {
     </div>
 
     <section class="neu-card">
-      <div style="display: grid; grid-template-columns: 1.8fr 1fr; gap: 1rem; align-items: end;">
+      <div class="resp-grid-search-bar">
         <div>
           <label class="form-label" for="teacherSearchInput">
             1. Buscar Alumno por Nombre, Apellido o DNI
@@ -1546,7 +1547,7 @@ function renderCoordinatorWorkspace() {
 
       <section class="neu-card">
         <div class="neu-well-sm" style="margin-bottom: 1.2rem;">
-          <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 0.75rem;">
+          <div class="resp-grid-3-filters">
             <div>
               <label class="form-label" for="coordLogSearchInput">Buscar por Alumno, DNI, Profesor o Lugar</label>
               <input
@@ -1602,7 +1603,7 @@ function renderCoordinatorWorkspace() {
         </button>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1.35fr; gap: 1.6rem; align-items: start;">
+      <div class="resp-grid-2">
         <!-- Alta Manual de Alumno por el Coordinador (con División A, B, C) -->
         <section class="neu-card">
           <h3 style="font-size: 1.2rem; margin-bottom: 0.35rem;">Registrar Alumno a Mano</h3>
@@ -1685,7 +1686,7 @@ function renderCoordinatorWorkspace() {
               />
             </div>
 
-            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 0.65rem;">
+            <div class="resp-grid-3-filters">
               <select class="neu-select" onchange="handleCoordFilterOri(this.value)">
                 <option value="ALL" ${coordStudentOriFilter === 'ALL' ? 'selected' : ''}>Todas las Orientaciones</option>
                 <option value="Electromecánica" ${coordStudentOriFilter === 'Electromecánica' ? 'selected' : ''}>⚙️ Electromecánica</option>
@@ -1828,7 +1829,7 @@ function renderCoordinatorWorkspace() {
       }
     </section>
 
-    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 1.6rem; align-items: start;">
+    <div class="resp-grid-2">
       <section class="neu-card">
         <h3 style="font-size: 1.18rem; margin-bottom: 0.35rem;">Pre-habilitar / Cargar Profesor</h3>
         <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.15rem;">
@@ -1877,50 +1878,170 @@ function renderCoordinatorWorkspace() {
         </div>
 
         <div class="logs-list">
-          ${activeOrOtherTeachers
-            .map((t) => {
-              const isAct = t.status === 'active';
-              const isPre = t.status === 'preapproved';
-              return `
-                <div class="log-item" style="align-items: center;">
-                  <div>
-                    <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.95rem;">
-                      ${escapeHtml(t.name)} — ${escapeHtml(t.email)}
-                    </div>
-                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem;">
-                      ${escapeHtml(t.orientation)}
-                    </div>
-                    <div style="margin-top: 0.25rem;">
-                      <span class="year-tag" style="color: ${
-                        isAct ? 'var(--alimentos-emerald)' : isPre ? 'var(--electro-cyan)' : 'var(--danger-crimson)'
-                      };">
-                        ${
-                          isAct
-                            ? '● Confirmado y Activo'
-                            : isPre
-                            ? '● Pre-habilitado (creará clave al registrarse)'
-                            : '○ Suspendido'
-                        }
-                      </span>
-                    </div>
-                  </div>
+          ${activeOrOtherTeachers.length === 0
+            ? `<div class="neu-well-sm" style="color: var(--text-secondary); font-size: 0.86rem;">
+                 Todavía no hay profesores habilitados. Podés confirmar solicitudes en Standby o pre-habilitar un correo desde el formulario.
+               </div>`
+            : activeOrOtherTeachers
+                .map((t) => {
+                  const isAct = t.status === 'active';
+                  const isPre = t.status === 'preapproved';
+                  const isEditingPass = coordEditingPassTeacherId === t.id;
+                  return `
+                    <div class="log-item" style="flex-direction: column; align-items: stretch;">
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; width: 100%; flex-wrap: wrap;">
+                        <div>
+                          <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.95rem;">
+                            ${escapeHtml(t.name)} — ${escapeHtml(t.email)}
+                          </div>
+                          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                            ${escapeHtml(t.orientation)}
+                          </div>
+                          <div style="margin-top: 0.25rem; display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                            <span class="year-tag" style="color: ${
+                              isAct ? 'var(--alimentos-emerald)' : isPre ? 'var(--electro-cyan)' : 'var(--danger-crimson)'
+                            };">
+                              ${
+                                isAct
+                                  ? '● Confirmado y Activo'
+                                  : isPre
+                                  ? '● Pre-habilitado (creará clave al registrarse)'
+                                  : '○ Suspendido'
+                              }
+                            </span>
+                            <span class="year-tag" style="color: ${t.password ? 'var(--alimentos-emerald)' : 'var(--tech-yellow)'};">
+                              ${t.password ? '🔐 Clave activa' : '⏳ Sin clave aún'}
+                            </span>
+                          </div>
+                        </div>
 
-                  <div style="display: flex; gap: 0.5rem;">
-                    ${
-                      isAct
-                        ? `<button type="button" class="neu-btn" style="padding: 0.38rem 0.7rem; font-size: 0.75rem;" onclick="setTeacherStatus('${t.id}', 'suspended')">Suspender</button>`
-                        : `<button type="button" class="neu-btn neu-btn-success" style="padding: 0.38rem 0.7rem; font-size: 0.75rem;" onclick="setTeacherStatus('${t.id}', 'active')">Activar</button>`
-                    }
-                    <button type="button" class="neu-btn neu-btn-danger" style="padding: 0.38rem 0.7rem; font-size: 0.75rem;" onclick="deleteTeacherRecord('${t.id}')">Quitar</button>
-                  </div>
-                </div>
-              `;
-            })
-            .join('')}
+                        <div style="display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: flex-end;">
+                          <button
+                            type="button"
+                            class="neu-btn ${isEditingPass ? 'active' : ''}"
+                            style="padding: 0.35rem 0.7rem; font-size: 0.75rem;"
+                            onclick="toggleCoordTeacherPasswordBox('${t.id}')"
+                          >
+                            🔑 Contraseña
+                          </button>
+                          ${
+                            isAct
+                              ? `<button type="button" class="neu-btn" style="padding: 0.35rem 0.7rem; font-size: 0.75rem;" onclick="setTeacherStatus('${t.id}', 'suspended')">Suspender</button>`
+                              : `<button type="button" class="neu-btn neu-btn-success" style="padding: 0.35rem 0.7rem; font-size: 0.75rem;" onclick="setTeacherStatus('${t.id}', 'active')">Activar</button>`
+                          }
+                          <button type="button" class="neu-btn neu-btn-danger" style="padding: 0.35rem 0.7rem; font-size: 0.75rem;" onclick="deleteTeacherRecord('${t.id}')">Quitar</button>
+                        </div>
+                      </div>
+
+                      ${
+                        isEditingPass
+                          ? `
+                            <div class="neu-well-sm" style="margin-top: 0.85rem; border-left: 3px solid var(--mech-orange);">
+                              <div style="font-family: 'IBM Plex Sans', sans-serif; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--mech-orange); margin-bottom: 0.35rem;">
+                                🔑 Gestión de Contraseña Docente — ${escapeHtml(t.name)}
+                              </div>
+                              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                                Si el profesor olvidó su contraseña, podés <strong>cambiarla aquí mismo</strong> o <strong>borrar su clave actual</strong> para que el docente cree una nueva desde "Registrarme como Profesor" con su Gmail.
+                              </p>
+                              <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 210px;">
+                                  <input
+                                    type="password"
+                                    id="coordNewProfPassInput_${t.id}"
+                                    class="neu-input"
+                                    style="padding: 0.58rem 0.9rem; font-size: 0.86rem;"
+                                    placeholder="Escribir nueva contraseña docente (mín. 4 caracteres)..."
+                                    value="${escapeHtml(t.password || '')}"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  class="neu-btn neu-btn-primary"
+                                  style="padding: 0.58rem 0.95rem; font-size: 0.79rem;"
+                                  onclick="saveTeacherNewPasswordByCoord('${t.id}')"
+                                >
+                                  Guardar Nueva Clave
+                                </button>
+                                ${
+                                  t.password
+                                    ? `
+                                      <button
+                                        type="button"
+                                        class="neu-btn neu-btn-yellow"
+                                        style="padding: 0.58rem 0.95rem; font-size: 0.79rem;"
+                                        onclick="clearTeacherPasswordByCoord('${t.id}')"
+                                      >
+                                        Borrar Clave (El profesor crea una nueva)
+                                      </button>
+                                    `
+                                    : ''
+                                }
+                                <button
+                                  type="button"
+                                  class="neu-btn"
+                                  style="padding: 0.58rem 0.8rem; font-size: 0.79rem;"
+                                  onclick="toggleCoordTeacherPasswordBox(null)"
+                                >
+                                  Cerrar
+                                </button>
+                              </div>
+                            </div>
+                          `
+                          : ''
+                      }
+                    </div>
+                  `;
+                })
+                .join('')}
         </div>
       </section>
     </div>
   `;
+}
+
+function toggleCoordTeacherPasswordBox(teacherId) {
+  coordEditingPassTeacherId = coordEditingPassTeacherId === teacherId ? null : teacherId;
+  renderApp();
+}
+
+async function saveTeacherNewPasswordByCoord(teacherId) {
+  const inputEl = document.getElementById(`coordNewProfPassInput_${teacherId}`);
+  if (!inputEl) return;
+  const newPass = inputEl.value;
+
+  if (!newPass || newPass.length < 4) {
+    showToast('La nueva contraseña del profesor debe tener al menos 4 caracteres.', 'error');
+    return;
+  }
+
+  await syncFromServerIfAvailable(true);
+  const t = appState.teachers.find((item) => item.id === teacherId);
+  if (!t) return;
+
+  t.password = newPass;
+  if (t.status === 'preapproved') {
+    t.status = 'active';
+  }
+  coordEditingPassTeacherId = null;
+  await saveState(true);
+  renderApp();
+  showToast(`Contraseña del profesor/a ${t.name} actualizada correctamente.`, 'success');
+}
+
+async function clearTeacherPasswordByCoord(teacherId) {
+  await syncFromServerIfAvailable(true);
+  const t = appState.teachers.find((item) => item.id === teacherId);
+  if (!t) return;
+
+  t.password = '';
+  t.status = 'preapproved';
+  coordEditingPassTeacherId = null;
+  await saveState(true);
+  renderApp();
+  showToast(
+    `Contraseña de ${t.name} borrada. Ahora el docente puede crear una nueva en "Registrarme como Profesor" con su Gmail.`,
+    'success'
+  );
 }
 
 // Funciones del Buscador de Alumnos del Coordinador
@@ -2728,7 +2849,122 @@ function showToast(message, type = 'info') {
   }, 4200);
 }
 
+// ==========================================================================
+// Instalación de Aplicación PWA Multiplataforma (Android / iOS / PC)
+// ==========================================================================
+
+let deferredPwaPrompt = null;
+
+function isRunningStandalonePwa() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function initPwaSupport() {
+  if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPwaPrompt = e;
+    const btnText = document.getElementById('btnInstallPwaText');
+    if (btnText) {
+      btnText.textContent = 'Descargar Aplicación (Instalar Ahora)';
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredPwaPrompt = null;
+    closePwaInstallModal();
+    showToast('¡Aplicación oficial E.P.E.T. N° 4 instalada correctamente!', 'success');
+  });
+}
+
+async function handleInstallPwaClick() {
+  if (deferredPwaPrompt) {
+    try {
+      deferredPwaPrompt.prompt();
+      const choiceResult = await deferredPwaPrompt.userChoice;
+      if (choiceResult && choiceResult.outcome === 'accepted') {
+        deferredPwaPrompt = null;
+        return;
+      }
+    } catch (_) {}
+  }
+
+  openPwaInstallModal();
+}
+
+function openPwaInstallModal() {
+  const modal = document.getElementById('pwaInstallGuideModal');
+  const body = document.getElementById('pwaInstallModalBody');
+  if (!modal || !body) return;
+
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(ua);
+  const standalone = isRunningStandalonePwa();
+
+  body.innerHTML = `
+    ${
+      standalone
+        ? `<div class="neu-well-sm" style="border-left: 4px solid var(--alimentos-emerald); color: var(--text-primary); font-size: 0.88rem;">
+             <strong>✓ Ya estás usando la aplicación instalada</strong> en tu dispositivo.
+           </div>`
+        : ''
+    }
+
+    <div class="log-item" style="${isAndroid ? 'border: 2px solid var(--mech-orange);' : ''}">
+      <div>
+        <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.98rem; color: var(--mech-orange);">
+          🤖 En Celulares Android (Chrome / Edge / Samsung Internet)
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem; line-height: 1.55;">
+          1. Tocá el menú de los <strong>tres puntos (⋮)</strong> arriba a la derecha en tu navegador.<br/>
+          2. Seleccioná <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.<br/>
+          3. Confirmá tocando <strong>Instalar</strong> y la app aparecerá con el escudo de la E.P.E.T. N° 4 junto a tus aplicaciones.
+        </div>
+      </div>
+    </div>
+
+    <div class="log-item alimentacion" style="${isIOS ? 'border: 2px solid var(--mech-orange);' : ''}">
+      <div>
+        <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.98rem; color: var(--tech-yellow);">
+          🍎 En iPhone / iPad (iOS — Safari)
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem; line-height: 1.55;">
+          1. Abrí esta página en <strong>Safari</strong> y tocá el botón <strong>Compartir</strong> (el ícono del cuadrado con la flecha hacia arriba <strong>↑</strong> en la barra inferior).<br/>
+          2. Deslizá hacia abajo y tocá <strong>"Agregar a Inicio"</strong>.<br/>
+          3. Tocá <strong>"Agregar"</strong> arriba a la derecha para instalarla como aplicación en tu iPhone o iPad.
+        </div>
+      </div>
+    </div>
+
+    <div class="log-item">
+      <div>
+        <div style="font-family: 'Merriweather', serif; font-weight: 700; font-size: 0.98rem;">
+          💻 En Computadora (Windows / Mac / Linux)
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem; line-height: 1.55;">
+          Hacé clic en el ícono de <strong>Instalar E.P.E.T. N° 4</strong> que aparece en la parte derecha de la barra de direcciones (en Chrome o Edge) para abrirla como aplicación de escritorio.
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('open');
+}
+
+function closePwaInstallModal() {
+  const modal = document.getElementById('pwaInstallGuideModal');
+  if (modal) modal.classList.remove('open');
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  initPwaSupport();
   processLogoTransparency();
   renderApp();
   syncFromServerIfAvailable();

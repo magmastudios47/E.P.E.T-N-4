@@ -271,6 +271,10 @@ h1, h2, h3, h4, .font-display {
   outline: none;
 }
 
+.neu-textarea {
+  resize: none;
+}
+
 .neu-select option {
   background: #F2E9D8;
   color: #2B1810;
@@ -318,12 +322,80 @@ h1, h2, h3, h4, .font-display {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1.25rem;
+  padding: 1.5rem 1.25rem;
+}
+
+.auth-gateway-container {
+  width: 100%;
+  max-width: 1120px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Barra Principal Superior para Descargar Aplicación PWA */
+.pwa-top-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.15rem;
+  padding: 1.05rem 1.45rem;
+  border-left: 5px solid var(--mech-orange);
+  flex-wrap: wrap;
+}
+
+.pwa-top-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.pwa-app-icon-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: var(--bg-main);
+  box-shadow: var(--neu-inset-sm);
+  border: 1px solid var(--border-subtle);
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pwa-app-icon-badge img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.pwa-top-tag {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mech-orange);
+}
+
+.pwa-top-title {
+  font-family: 'Merriweather', serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 0.1rem;
+}
+
+.pwa-install-main-btn {
+  padding: 0.75rem 1.35rem;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .auth-gateway-grid {
   width: 100%;
-  max-width: 1120px;
   display: grid;
   grid-template-columns: 1fr 1.12fr;
   gap: 2.2rem;
@@ -1014,15 +1086,67 @@ h1, h2, h3, h4, .font-display {
   to { opacity: 1; transform: translateX(0); }
 }
 
+/* Grids Responsivos Multiplataforma (Android / iOS / Tablet / Desktop) */
+.resp-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 1.6rem;
+  align-items: start;
+}
+
+.resp-grid-search-bar {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
+.resp-grid-3-filters {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 0.7rem;
+}
+
 @media (max-width: 1024px) {
   .auth-gateway-grid,
   .workspace-shell,
-  .student-personal-grid {
+  .student-personal-grid,
+  .resp-grid-2 {
     grid-template-columns: 1fr;
   }
   .sidebar-nav {
     position: static;
     min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .resp-grid-search-bar,
+  .resp-grid-3-filters {
+    grid-template-columns: 1fr;
+  }
+  .pwa-top-banner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem 1.15rem;
+  }
+  .pwa-install-main-btn {
+    width: 100%;
+  }
+  .auth-hero-card,
+  .auth-box-card,
+  .neu-card {
+    padding: 1.25rem;
+  }
+  .workspace-shell {
+    padding: 0.9rem;
+    gap: 1.1rem;
+  }
+  /* Evitar auto-zoom en Safari iOS cuando se toca un input (<16px) */
+  .neu-input,
+  .neu-select,
+  .neu-textarea {
+    font-size: 16px;
   }
 }
 
@@ -1032,6 +1156,22 @@ h1, h2, h3, h4, .font-display {
   .role-tabs-bar,
   .cert-signatures {
     grid-template-columns: 1fr;
+  }
+  .log-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .certificate-paper {
+    padding: 1.2rem;
+  }
+  .cert-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .toast-container {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
   }
 }
 

@@ -1,0 +1,26 @@
+{
+  "name": "E.P.E.T. N° 4 — Prácticas Profesionalizantes",
+  "short_name": "EPET 4 PP",
+  "description": "Sistema Oficial de Control de Horas y Certificación de Prácticas Profesionalizantes — E.P.E.T. N° 4 Junín de los Andes",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F2E9D8",
+  "theme_color": "#A61D00",
+  "lang": "es-AR",
+  "icons": [
+    {
+      "src": "/logo_epet4.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo_epet4.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -2,13 +2,21 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#A61D00" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="EPET 4 PP" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="logo_epet4.png" />
+  <link rel="apple-touch-icon" href="logo_epet4.png" />
   <title>E.P.E.T. N° 4 Junín de los Andes | Prácticas Profesionalizantes</title>
   <!-- Google Fonts: Merriweather + Inter + IBM Plex Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
-  <!-- Estilos Neumórficos Institucionales (#A61D00 / #F2E9D8 / #8C5C32 / #BD5B4F) -->
+  <!-- Estilos Institucionales (#A61D00 / #F2E9D8 / #8C5C32 / #BD5B4F) -->
   <link rel="stylesheet" href="css/styles.css" />
   <!-- jsPDF para generar el Certificado PDF Oficial listo para imprimir -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -19,10 +27,29 @@
        PANTALLA 1: PORTAL DE ACCESO CON LOS 3 APARTADOS SEPARADOS Y SEGURIDAD
        ====================================================================== -->
   <div id="authGatewayScreen" class="auth-gateway-wrapper">
-    <div class="auth-gateway-grid">
+    <div class="auth-gateway-container">
 
-      <!-- Columna Izquierda: Identidad Técnica E.P.E.T. N° 4 -->
-      <section class="neu-card auth-hero-card">
+      <!-- Barra Principal Superior: Botón Destacado para Descargar como Aplicación PWA (Android, iOS, PC) -->
+      <div class="neu-card pwa-top-banner" id="pwaTopInstallBanner">
+        <div class="pwa-top-banner-info">
+          <div class="pwa-app-icon-badge">
+            <img class="epet-logo-img" src="logo_epet4.png" alt="App EPET 4" />
+          </div>
+          <div>
+            <div class="pwa-top-tag">APLICACIÓN OFICIAL MULTIPLATAFORMA • ANDROID • iOS • PC</div>
+            <div class="pwa-top-title">Instalá la App de Prácticas Profesionalizantes en tu celular o computadora</div>
+          </div>
+        </div>
+        <button type="button" class="neu-btn neu-btn-primary pwa-install-main-btn" id="btnInstallPwaMain" onclick="handleInstallPwaClick()">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span id="btnInstallPwaText">Descargar Aplicación (PWA)</span>
+        </button>
+      </div>
+
+      <div class="auth-gateway-grid">
+
+        <!-- Columna Izquierda: Identidad Técnica E.P.E.T. N° 4 -->
+        <section class="neu-card auth-hero-card">
         <div>
           <span class="hero-top-badge">
             <span>●</span> E.P.E.T. N° 4 "Gendarmería Nacional" • Junín de los Andes
@@ -420,6 +447,7 @@
         </div>
 
       </section>
+      </div>
     </div>
   </div>
 
@@ -456,6 +484,10 @@
       </div>
 
       <div class="sidebar-footer">
+        <button type="button" class="neu-btn" style="width: 100%; justify-content: flex-start; font-size: 0.82rem;" onclick="handleInstallPwaClick()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar App (PWA)
+        </button>
         <button type="button" class="neu-btn neu-btn-danger" style="width: 100%; justify-content: flex-start;" onclick="logoutSession()">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Cerrar Sesión / Salir
@@ -480,7 +512,7 @@
           </span>
           <h3 style="font-size: 1.25rem;">Certificado de Prácticas Profesionalizantes</h3>
         </div>
-        <div style="display: flex; gap: 0.65rem;">
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
           <button type="button" class="neu-btn neu-btn-success" id="btnModalDownloadPdf">
             Descargar PDF Listo para Imprimir
           </button>
@@ -489,6 +521,23 @@
       </div>
 
       <div id="certificatePreviewPaper" class="certificate-paper"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL DE INSTALACIÓN DE APLICACIÓN PWA (ANDROID / iOS / COMPUTADORA)
+       ====================================================================== -->
+  <div id="pwaInstallGuideModal" class="modal-backdrop" onclick="if(event.target===this) closePwaInstallModal()">
+    <div class="modal-card" style="max-width: 600px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <span class="hero-top-badge" style="margin-bottom: 0.25rem;">INSTALACIÓN DE LA APP OFICIAL E.P.E.T. N° 4</span>
+          <h3 style="font-size: 1.3rem;">Instalar en tu Celular o Computadora</h3>
+        </div>
+        <button type="button" class="neu-btn" style="padding: 0.45rem 0.85rem; font-size: 0.82rem;" onclick="closePwaInstallModal()">Cerrar</button>
+      </div>
+
+      <div id="pwaInstallModalBody" class="logs-list"></div>
     </div>
   </div>
 
