@@ -46,6 +46,8 @@ const DB_PATH = process.env.VERCEL
 const BUNDLED_ASSETS = [
   path.join(__dirname, 'index.html'),
   path.join(__dirname, 'logo_epet4.png'),
+  path.join(__dirname, 'icon-192.png'),
+  path.join(__dirname, 'icon-512.png'),
   path.join(__dirname, 'manifest.json'),
   path.join(__dirname, 'sw.js'),
   path.join(__dirname, 'css', 'styles.css'),

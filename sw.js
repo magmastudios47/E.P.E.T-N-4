@@ -1,4 +1,4 @@
-const CACHE_NAME = 'epet4-pwa-cache-v5';
+const CACHE_NAME = 'epet4-pwa-cache-v6';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -6,6 +6,8 @@ const STATIC_ASSETS = [
   '/js/app.js',
   '/js/logo-data.js',
   '/logo_epet4.png',
+  '/icon-192.png',
+  '/icon-512.png',
   '/manifest.json'
 ];
 
