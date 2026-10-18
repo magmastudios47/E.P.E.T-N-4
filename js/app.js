@@ -202,10 +202,64 @@ let coordStudentOriFilter = 'ALL';
 let coordStudentYearFilter = 'ALL';
 let coordStudentDivFilter = 'ALL';
 
+// Estado del buscador en el Historial General del Coordinador
+let coordLogSearchQuery = '';
+let coordLogOriFilter = 'ALL';
+let coordLogTeacherFilter = 'ALL';
+
 let processedTransparentLogoDataUrl = null;
+let lastServerStateHash = '';
 
 // ==========================================================================
-// Persistencia Local + Sincronización con Servidor Node
+// Botón de Ver / Ocultar Contraseña (Ojito Neumórfico) en todos los inputs
+// ==========================================================================
+
+function getEyeIconSvg(isShowing) {
+  if (isShowing) {
+    return `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+  }
+  return `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+}
+
+function togglePasswordVisibility(btnEl) {
+  const wrap = btnEl.closest('.password-input-wrap');
+  if (!wrap) return;
+  const input = wrap.querySelector('input');
+  if (!input) return;
+  const isNowVisible = input.type === 'password';
+  input.type = isNowVisible ? 'text' : 'password';
+  btnEl.classList.toggle('showing', isNowVisible);
+  btnEl.title = isNowVisible ? 'Ocultar contraseña' : 'Ver contraseña';
+  btnEl.setAttribute('aria-label', isNowVisible ? 'Ocultar contraseña' : 'Ver contraseña');
+  btnEl.innerHTML = getEyeIconSvg(isNowVisible);
+}
+
+function enhancePasswordInputs() {
+  const passInputs = document.querySelectorAll('input[type="password"]');
+  passInputs.forEach((input) => {
+    if (input.parentElement && input.parentElement.classList.contains('password-input-wrap')) {
+      return;
+    }
+    const wrap = document.createElement('div');
+    wrap.className = 'password-input-wrap';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'password-toggle-btn';
+    btn.title = 'Ver contraseña';
+    btn.setAttribute('aria-label', 'Ver contraseña');
+    btn.innerHTML = getEyeIconSvg(false);
+    btn.onclick = function () {
+      togglePasswordVisibility(btn);
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+// ==========================================================================
+// Persistencia Local + Sincronización en la Nube (Neon PostgreSQL / Vercel)
 // ==========================================================================
 
 function loadState() {
@@ -225,33 +279,55 @@ function loadState() {
   return initial;
 }
 
-function saveState() {
+async function saveState(forceReplace = false) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
   } catch (e) {
     console.error('Error guardando estado:', e);
   }
   if (window.location.protocol.startsWith('http')) {
-    fetch('/api/state', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(appState)
-    }).catch(() => {});
+    try {
+      const payload = forceReplace ? { ...appState, _forceReplace: true } : appState;
+      const res = await fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.state && Array.isArray(data.state.students) && Array.isArray(data.state.teachers)) {
+          appState = data.state;
+          const serialized = JSON.stringify(appState);
+          lastServerStateHash = serialized;
+          localStorage.setItem(STORAGE_KEY, serialized);
+        }
+      }
+    } catch (_) {}
   }
 }
 
-async function syncFromServerIfAvailable() {
+async function syncFromServerIfAvailable(skipRender = false) {
   if (!window.location.protocol.startsWith('http')) return;
   try {
-    const res = await fetch('/api/state');
+    const res = await fetch('/api/state?t=' + Date.now(), { cache: 'no-store' });
+    if (res.status === 204) {
+      await saveState(true);
+      return;
+    }
     if (res.ok) {
       const serverData = await res.json();
       if (serverData && Array.isArray(serverData.students) && Array.isArray(serverData.teachers)) {
+        const serialized = JSON.stringify(serverData);
+        const changed = serialized !== lastServerStateHash;
         appState = serverData;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-        renderApp();
+        lastServerStateHash = serialized;
+        localStorage.setItem(STORAGE_KEY, serialized);
+        if (!skipRender && changed) {
+          renderApp();
+        }
       } else {
-        saveState();
+        await saveState(true);
       }
     }
   } catch (_) {}
@@ -418,10 +494,12 @@ function switchTeacherAuthMode(mode) {
 // Flujo A: Login y Registro de ALUMNOS (con Contraseña, División A/B/C y DNI)
 // ==========================================================================
 
-function handleStudentLoginSubmit(e) {
+async function handleStudentLoginSubmit(e) {
   e.preventDefault();
   const email = document.getElementById('stuLoginEmail').value.trim().toLowerCase();
   const pass = document.getElementById('stuLoginPass').value;
+
+  await syncFromServerIfAvailable(true);
 
   const stu = findStudentByEmail(email);
   if (!stu) {
@@ -463,7 +541,7 @@ function handleStudentLoginSubmit(e) {
   showToast(`¡Bienvenido/a ${stu.name}!`, 'success');
 }
 
-function handleStudentRegisterSubmit(e) {
+async function handleStudentRegisterSubmit(e) {
   e.preventDefault();
   const name = document.getElementById('stuRegName').value.trim();
   const dni = document.getElementById('stuRegDni').value.replace(/\D/g, '');
@@ -488,6 +566,8 @@ function handleStudentRegisterSubmit(e) {
     showToast('Las contraseñas ingresadas no coinciden.', 'error');
     return;
   }
+
+  await syncFromServerIfAvailable(true);
 
   if (findTeacherByEmail(email)) {
     showToast('Ese correo figura en el padrón de Profesores. Usá el apartado de Profesores.', 'error');
@@ -533,7 +613,7 @@ function handleStudentRegisterSubmit(e) {
   }
 
   selectedTeacherStudentId = stu.id;
-  saveState();
+  await saveState();
 
   saveSession({
     role: 'alumno',
@@ -546,19 +626,21 @@ function handleStudentRegisterSubmit(e) {
   document.getElementById('stuRegPassConfirm').value = '';
   currentSubView = 'main';
   renderApp();
-  showToast('¡Cuenta de alumno creada y guardada con contraseña!', 'success');
+  showToast('¡Cuenta de alumno creada y sincronizada en la nube!', 'success');
 }
 
 // ==========================================================================
 // Flujo B: Login y Registro de PROFESORES (con Contraseña + Estado Standby)
 // ==========================================================================
 
-function handleTeacherLoginSubmit(e) {
+async function handleTeacherLoginSubmit(e) {
   e.preventDefault();
   const email = document.getElementById('profLoginEmail').value.trim().toLowerCase();
   const pass = document.getElementById('profLoginPass').value;
   const standbyBox = document.getElementById('profStandbyNoticeBox');
   if (standbyBox) standbyBox.style.display = 'none';
+
+  await syncFromServerIfAvailable(true);
 
   const teacher = findTeacherByEmail(email);
   if (!teacher) {
@@ -621,7 +703,7 @@ function handleTeacherLoginSubmit(e) {
   showToast(`Bienvenido/a ${teacher.name}. Acceso docente confirmado.`, 'success');
 }
 
-function handleTeacherRegisterSubmit(e) {
+async function handleTeacherRegisterSubmit(e) {
   e.preventDefault();
   const name = document.getElementById('profRegName').value.trim();
   const email = document.getElementById('profRegEmail').value.trim().toLowerCase();
@@ -644,6 +726,8 @@ function handleTeacherRegisterSubmit(e) {
     return;
   }
 
+  await syncFromServerIfAvailable(true);
+
   const existing = findTeacherByEmail(email);
 
   if (existing && existing.status === 'preapproved' && !existing.password) {
@@ -651,7 +735,7 @@ function handleTeacherRegisterSubmit(e) {
     existing.orientation = orientation;
     existing.password = pass;
     existing.status = 'active';
-    saveState();
+    await saveState();
 
     saveSession({
       role: 'profesor',
@@ -689,7 +773,7 @@ function handleTeacherRegisterSubmit(e) {
   };
 
   appState.teachers.unshift(newTeacher);
-  saveState();
+  await saveState();
 
   document.getElementById('profRegName').value = '';
   document.getElementById('profRegEmail').value = '';
@@ -720,10 +804,12 @@ function handleTeacherRegisterSubmit(e) {
 // Flujo C: Login del COORDINADOR / DIRECTOR (Usuario y Contraseña)
 // ==========================================================================
 
-function handleCoordinatorLoginSubmit(e) {
+async function handleCoordinatorLoginSubmit(e) {
   e.preventDefault();
   const user = document.getElementById('coordUserInput').value.trim();
   const pass = document.getElementById('coordPassInput').value;
+
+  await syncFromServerIfAvailable(true);
 
   const validUser = appState.config.coordUsername || 'coordinador';
   const validPass = appState.config.coordPassword || 'epet4';
@@ -780,6 +866,7 @@ function renderApp() {
   if (!currentSession) {
     authScreen.style.display = 'flex';
     workspaceScreen.style.display = 'none';
+    enhancePasswordInputs();
     return;
   }
 
@@ -795,6 +882,8 @@ function renderApp() {
   } else if (currentSession.role === 'coordinador') {
     renderCoordinatorWorkspace();
   }
+
+  enhancePasswordInputs();
 }
 
 // ==========================================================================
@@ -830,6 +919,7 @@ function renderSidebar() {
     `;
   } else if (currentSession.role === 'profesor') {
     const teacher = findTeacherByEmail(currentSession.email);
+    const myLogsCount = countTeacherLogs(currentSession.email);
     userCard.innerHTML = `
       <span class="user-role-tag profesor">👨‍🏫 Profesor Confirmado</span>
       <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1rem;">
@@ -848,7 +938,7 @@ function renderSidebar() {
         <span>🔍 Buscar Alumno y Cargar Horas</span>
       </button>
       <button type="button" class="sidebar-link ${currentSubView === 'historial' ? 'active' : ''}" onclick="setSubView('historial')">
-        <span>📋 Historial de Cargas (${countTotalLogs()})</span>
+        <span>📋 Mi Historial de Cargas (${myLogsCount})</span>
       </button>
     `;
   } else if (currentSession.role === 'coordinador') {
@@ -872,6 +962,9 @@ function renderSidebar() {
       <button type="button" class="sidebar-link ${currentSubView === 'alumnos' ? 'active' : ''}" onclick="setSubView('alumnos')">
         <span>🎓 Buscar y Registrar Alumnos (${appState.students.length})</span>
       </button>
+      <button type="button" class="sidebar-link ${currentSubView === 'historial_general' ? 'active' : ''}" onclick="setSubView('historial_general')">
+        <span>📋 Historial General de Cargas (${countTotalLogs()})</span>
+      </button>
       <button type="button" class="sidebar-link ${currentSubView === 'config' ? 'active' : ''}" onclick="setSubView('config')">
         <span>⚙️ Clave Coordinador y PDF</span>
       </button>
@@ -886,6 +979,15 @@ function setSubView(viewName) {
 
 function countTotalLogs() {
   return appState.students.reduce((sum, s) => sum + (s.logs ? s.logs.length : 0), 0);
+}
+
+function countTeacherLogs(teacherEmail) {
+  const cleanEmail = (teacherEmail || '').trim().toLowerCase();
+  if (!cleanEmail) return 0;
+  return appState.students.reduce((sum, s) => {
+    const myLogs = (s.logs || []).filter((l) => (l.teacherEmail || '').trim().toLowerCase() === cleanEmail);
+    return sum + myLogs.length;
+  }, 0);
 }
 
 // ==========================================================================
@@ -1152,11 +1254,8 @@ function renderStudentPersonalWorkspace() {
   `;
 }
 
-function handleStudentUpdateOwnProfile(e) {
+async function handleStudentUpdateOwnProfile(e) {
   e.preventDefault();
-  const stu = appState.students.find((s) => s.id === currentSession?.studentId);
-  if (!stu) return;
-
   const name = document.getElementById('editOwnName').value.trim();
   const dni = document.getElementById('editOwnDni').value.replace(/\D/g, '');
   const orientation = document.getElementById('editOwnOrientation').value;
@@ -1169,6 +1268,10 @@ function handleStudentUpdateOwnProfile(e) {
     return;
   }
 
+  await syncFromServerIfAvailable(true);
+  const stu = appState.students.find((s) => s.id === currentSession?.studentId);
+  if (!stu) return;
+
   stu.name = name;
   stu.dni = dni;
   stu.orientation = orientation;
@@ -1177,11 +1280,11 @@ function handleStudentUpdateOwnProfile(e) {
   stu.password = pass;
   currentSession.name = name;
 
-  saveState();
+  await saveState(true);
   saveSession(currentSession);
   currentSubView = 'main';
   renderApp();
-  showToast('Tus datos y contraseña se actualizaron correctamente.', 'success');
+  showToast('Tus datos y contraseña se actualizaron correctamente en la nube.', 'success');
 }
 
 // ==========================================================================
@@ -1192,30 +1295,48 @@ function renderTeacherWorkspace() {
   const container = document.getElementById('workspaceMainContainer');
 
   if (currentSubView === 'historial') {
-    const allLogs = [];
+    const myEmail = (currentSession?.email || '').trim().toLowerCase();
+    const myLogs = [];
     appState.students.forEach((stu) => {
       (stu.logs || []).forEach((log) => {
-        allLogs.push({
-          ...log,
-          studentId: stu.id,
-          studentName: stu.name,
-          studentDni: stu.dni,
-          orientation: stu.orientation,
-          courseLabel: formatCourseLabel(stu)
-        });
+        if ((log.teacherEmail || '').trim().toLowerCase() === myEmail) {
+          myLogs.push({
+            ...log,
+            studentId: stu.id,
+            studentName: stu.name,
+            studentDni: stu.dni,
+            orientation: stu.orientation,
+            courseLabel: formatCourseLabel(stu)
+          });
+        }
       });
     });
-    allLogs.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    myLogs.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    const totalMyHours = myLogs.reduce((acc, item) => acc + (Number(item.hours) || 0), 0);
 
     container.innerHTML = `
+      <div class="neu-card workspace-header-banner">
+        <div>
+          <span class="hero-top-badge">REGISTRO PERSONAL DOCENTE • E.P.E.T. N° 4</span>
+          <h1 style="font-size: 1.6rem;">Mi Historial de Horas Cargadas</h1>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">
+            Aquí figuran únicamente las acreditaciones realizadas desde tu cuenta (<strong>${escapeHtml(currentSession.email)}</strong>).
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+          <span class="neu-pill">${myLogs.length} ${myLogs.length === 1 ? 'carga mía' : 'cargas mías'}</span>
+          <span class="neu-pill font-mono" style="color: var(--mech-orange);">${totalMyHours} hs acreditadas</span>
+        </div>
+      </div>
+
       <div class="neu-card">
-        <span class="hero-top-badge">REGISTRO DE ACREDITACIONES DOCENTES</span>
-        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Historial de Horas Cargadas</h2>
         <div class="logs-list">
           ${
-            allLogs.length === 0
-              ? `<div class="neu-well" style="text-align:center;">No hay horas cargadas todavía.</div>`
-              : allLogs
+            myLogs.length === 0
+              ? `<div class="neu-well" style="text-align:center; padding: 2rem;">
+                   Todavía no realizaste ninguna carga de horas desde tu cuenta docente (<strong>${escapeHtml(currentSession.name)}</strong>).
+                 </div>`
+              : myLogs
                   .map(
                     (item) => `
                   <div class="log-item ${item.orientation === 'Electromecánica' ? '' : 'alimentacion'}">
@@ -1228,7 +1349,7 @@ function renderTeacherWorkspace() {
                         <strong>${escapeHtml(item.place)}:</strong> ${escapeHtml(item.description)}
                       </div>
                       <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
-                        📅 ${formatDateAR(item.date)} • Cargado por: ${escapeHtml(item.teacherName)} (${escapeHtml(item.teacherEmail)})
+                        📅 ${formatDateAR(item.date)} • Acreditado por vos (${escapeHtml(item.teacherName)})
                       </div>
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.45rem;">
@@ -1483,12 +1604,9 @@ function renderTeacherLoadHoursForm(defaultDate) {
   `;
 }
 
-function handleAddHoursSubmit(e) {
+async function handleAddHoursSubmit(e) {
   e.preventDefault();
   if (!currentSession || currentSession.role !== 'profesor') return;
-
-  const stu = appState.students.find((s) => s.id === selectedTeacherStudentId);
-  if (!stu) return;
 
   const hours = Number(document.getElementById('inputHoursAmount').value);
   const date = document.getElementById('inputPracticeDate').value;
@@ -1499,6 +1617,11 @@ function handleAddHoursSubmit(e) {
     showToast('Ingresá una cantidad de horas válida.', 'error');
     return;
   }
+
+  await syncFromServerIfAvailable(true);
+
+  const stu = appState.students.find((s) => s.id === selectedTeacherStudentId);
+  if (!stu) return;
 
   const prevHours = getStudentTotalHours(stu);
   stu.logs.unshift({
@@ -1512,7 +1635,7 @@ function handleAddHoursSubmit(e) {
   });
 
   const newTotal = getStudentTotalHours(stu);
-  saveState();
+  await saveState();
   renderApp();
 
   if (prevHours < REQUIRED_HOURS && newTotal >= REQUIRED_HOURS) {
@@ -1522,12 +1645,25 @@ function handleAddHoursSubmit(e) {
   }
 }
 
-function deletePracticeLog(studentId, logId) {
+async function deletePracticeLog(studentId, logId) {
   if (!currentSession || (currentSession.role !== 'profesor' && currentSession.role !== 'coordinador')) return;
   const stu = appState.students.find((s) => s.id === studentId);
   if (!stu) return;
+
+  const targetLog = (stu.logs || []).find((l) => l.id === logId);
+  if (!targetLog) return;
+
+  if (currentSession.role === 'profesor') {
+    const myEmail = (currentSession.email || '').trim().toLowerCase();
+    const logOwner = (targetLog.teacherEmail || '').trim().toLowerCase();
+    if (logOwner !== myEmail) {
+      showToast('Solo podés anular cargas realizadas desde tu propia cuenta de profesor.', 'error');
+      return;
+    }
+  }
+
   stu.logs = stu.logs.filter((l) => l.id !== logId);
-  saveState();
+  await saveState(true);
   renderApp();
   showToast('Registro de horas anulado.', 'success');
 }
@@ -1536,11 +1672,80 @@ function deletePracticeLog(studentId, logId) {
 // PANEL 3: COORDINADOR / DIRECTOR
 // - Confirmar Profesores en Standby + Pre-autorizar Gmails
 // - Buscador de Alumnos + Registrar Alumnos a mano (con División A, B, C)
+// - Historial General de Cargas (exclusivo del Coordinador)
 // - Cambiar Usuario/Contraseña de Coordinación (sin botón de restaurar fábrica)
 // ==========================================================================
 
 function renderCoordinatorWorkspace() {
   const container = document.getElementById('workspaceMainContainer');
+
+  // Sub-vista 4: Historial General de Cargas (Exclusivo para el Coordinador / Director)
+  if (currentSubView === 'historial_general') {
+    const teacherOptions = appState.teachers
+      .map(
+        (t) =>
+          `<option value="${escapeHtml(t.email.toLowerCase())}" ${
+            coordLogTeacherFilter === t.email.toLowerCase() ? 'selected' : ''
+          }>👨‍🏫 ${escapeHtml(t.name)} (${escapeHtml(t.email)})</option>`
+      )
+      .join('');
+
+    container.innerHTML = `
+      <div class="neu-card workspace-header-banner">
+        <div>
+          <span class="hero-top-badge">AUDITORÍA GENERAL • EXCLUSIVO COORDINACIÓN</span>
+          <h1 style="font-size: 1.65rem;">Historial General de Cargas de Horas</h1>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">
+            Supervisá todas las cargas realizadas por todos los profesores de la E.P.E.T. N° 4, filtrá por docente o alumno y anulá registros en caso de error.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <span class="neu-pill" id="coordLogsCountPill">${countTotalLogs()} registros</span>
+          <span class="neu-pill font-mono" id="coordLogsHoursPill" style="color: var(--mech-orange);">0 hs</span>
+        </div>
+      </div>
+
+      <section class="neu-card">
+        <div class="neu-well-sm" style="margin-bottom: 1.2rem;">
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label class="form-label" for="coordLogSearchInput">Buscar por Alumno, DNI, Profesor o Lugar</label>
+              <input
+                type="text"
+                id="coordLogSearchInput"
+                class="neu-input"
+                placeholder="🔍 Escribí alumno, DNI, profesor o empresa..."
+                value="${escapeHtml(coordLogSearchQuery)}"
+                oninput="handleCoordLogSearch(this.value)"
+              />
+            </div>
+
+            <div>
+              <label class="form-label" for="coordLogTeacherSelect">Filtrar por Profesor</label>
+              <select id="coordLogTeacherSelect" class="neu-select" onchange="handleCoordLogTeacherFilter(this.value)">
+                <option value="ALL" ${coordLogTeacherFilter === 'ALL' ? 'selected' : ''}>Todos los Profesores</option>
+                ${teacherOptions}
+              </select>
+            </div>
+
+            <div>
+              <label class="form-label" for="coordLogOriSelect">Filtrar por Orientación</label>
+              <select id="coordLogOriSelect" class="neu-select" onchange="handleCoordLogOriFilter(this.value)">
+                <option value="ALL" ${coordLogOriFilter === 'ALL' ? 'selected' : ''}>Todas las Orientaciones</option>
+                <option value="Electromecánica" ${coordLogOriFilter === 'Electromecánica' ? 'selected' : ''}>⚙️ Electromecánica</option>
+                <option value="Ciencias de la Alimentación" ${coordLogOriFilter === 'Ciencias de la Alimentación' ? 'selected' : ''}>🧪 Ciencias de la Alimentación</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="coordGeneralLogsListContainer" class="logs-list"></div>
+      </section>
+    `;
+
+    renderCoordinatorGeneralLogsList();
+    return;
+  }
 
   // Sub-vista 2: Buscador de Alumnos + Alta Manual de Alumnos por el Coordinador
   if (currentSubView === 'alumnos') {
@@ -1971,37 +2176,146 @@ function renderCoordinatorStudentsList() {
     .join('');
 }
 
-function confirmStandbyTeacher(teacherId) {
+// Funciones del Historial General de Cargas (Exclusivo Coordinador)
+function handleCoordLogSearch(val) {
+  coordLogSearchQuery = val;
+  renderCoordinatorGeneralLogsList();
+}
+
+function handleCoordLogTeacherFilter(val) {
+  coordLogTeacherFilter = val;
+  renderCoordinatorGeneralLogsList();
+}
+
+function handleCoordLogOriFilter(val) {
+  coordLogOriFilter = val;
+  renderCoordinatorGeneralLogsList();
+}
+
+function renderCoordinatorGeneralLogsList() {
+  const listEl = document.getElementById('coordGeneralLogsListContainer');
+  const countPill = document.getElementById('coordLogsCountPill');
+  const hoursPill = document.getElementById('coordLogsHoursPill');
+  if (!listEl) return;
+
+  const allLogs = [];
+  appState.students.forEach((stu) => {
+    (stu.logs || []).forEach((log) => {
+      allLogs.push({
+        ...log,
+        studentId: stu.id,
+        studentName: stu.name,
+        studentDni: stu.dni,
+        orientation: stu.orientation,
+        courseLabel: formatCourseLabel(stu)
+      });
+    });
+  });
+  allLogs.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+
+  const q = coordLogSearchQuery.trim().toLowerCase();
+  const filtered = allLogs.filter((item) => {
+    const matchQ =
+      !q ||
+      item.studentName.toLowerCase().includes(q) ||
+      String(item.studentDni).toLowerCase().includes(q) ||
+      (item.teacherName || '').toLowerCase().includes(q) ||
+      (item.teacherEmail || '').toLowerCase().includes(q) ||
+      (item.place || '').toLowerCase().includes(q) ||
+      (item.description || '').toLowerCase().includes(q);
+    const matchTeacher =
+      coordLogTeacherFilter === 'ALL' ||
+      (item.teacherEmail || '').trim().toLowerCase() === coordLogTeacherFilter;
+    const matchOri = coordLogOriFilter === 'ALL' || item.orientation === coordLogOriFilter;
+    return matchQ && matchTeacher && matchOri;
+  });
+
+  const sumHours = filtered.reduce((acc, item) => acc + (Number(item.hours) || 0), 0);
+  if (countPill) {
+    countPill.textContent = `${filtered.length} de ${allLogs.length} registros`;
+  }
+  if (hoursPill) {
+    hoursPill.textContent = `${sumHours} hs acreditadas`;
+  }
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `
+      <div class="neu-well-sm" style="text-align: center; color: var(--text-secondary);">
+        No se encontraron cargas de horas con esos criterios de búsqueda.
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = filtered
+    .map(
+      (item) => `
+      <div class="log-item ${item.orientation === 'Electromecánica' ? '' : 'alimentacion'}">
+        <div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700;">
+            ${escapeHtml(item.studentName)} — <span class="font-mono">DNI ${formatDni(item.studentDni)}</span>
+            <span style="font-weight: 500; color: var(--text-muted);">(${escapeHtml(item.courseLabel)} • ${escapeHtml(item.orientation)})</span>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">
+            <strong>${escapeHtml(item.place)}:</strong> ${escapeHtml(item.description)}
+          </div>
+          <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.25rem;">
+            📅 ${formatDateAR(item.date)} • Cargado por Profesor: <strong style="color: var(--tech-yellow);">${escapeHtml(item.teacherName)}</strong> (${escapeHtml(item.teacherEmail)})
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.45rem;">
+          <span class="log-item-hours">+${item.hours} HS</span>
+          <button
+            type="button"
+            class="neu-btn neu-btn-danger"
+            style="padding: 0.25rem 0.65rem; font-size: 0.74rem;"
+            onclick="deletePracticeLog('${item.studentId}', '${item.id}')"
+          >
+            Anular
+          </button>
+        </div>
+      </div>
+    `
+    )
+    .join('');
+}
+
+async function confirmStandbyTeacher(teacherId) {
+  await syncFromServerIfAvailable(true);
   const t = appState.teachers.find((item) => item.id === teacherId);
   if (!t) return;
   t.status = 'active';
-  saveState();
+  await saveState(true);
   renderApp();
   showToast(`Profesor/a ${t.name} (${t.email}) CONFIRMADO. Ya puede iniciar sesión y cargar horas.`, 'success');
 }
 
-function setTeacherStatus(teacherId, newStatus) {
+async function setTeacherStatus(teacherId, newStatus) {
+  await syncFromServerIfAvailable(true);
   const t = appState.teachers.find((item) => item.id === teacherId);
   if (!t) return;
   t.status = newStatus;
-  saveState();
+  await saveState(true);
   renderApp();
   showToast(`Estado de ${t.email} actualizado.`, 'success');
 }
 
-function deleteTeacherRecord(teacherId) {
+async function deleteTeacherRecord(teacherId) {
+  await syncFromServerIfAvailable(true);
   appState.teachers = appState.teachers.filter((item) => item.id !== teacherId);
-  saveState();
+  await saveState(true);
   renderApp();
   showToast('Registro de profesor eliminado.', 'success');
 }
 
-function handleCoordinatorAddTeacherSubmit(e) {
+async function handleCoordinatorAddTeacherSubmit(e) {
   e.preventDefault();
   const email = document.getElementById('coordAddProfEmail').value.trim().toLowerCase();
   const name = document.getElementById('coordAddProfName').value.trim();
   const orientation = document.getElementById('coordAddProfOri').value;
   const pass = document.getElementById('coordAddProfPass').value;
+
+  await syncFromServerIfAvailable(true);
 
   const existing = findTeacherByEmail(email);
   if (existing) {
@@ -2021,12 +2335,12 @@ function handleCoordinatorAddTeacherSubmit(e) {
     });
   }
 
-  saveState();
+  await saveState(true);
   renderApp();
   showToast(`Profesor ${name} (${email}) habilitado por Coordinación.`, 'success');
 }
 
-function handleCoordinatorManualStudentSubmit(e) {
+async function handleCoordinatorManualStudentSubmit(e) {
   e.preventDefault();
   const name = document.getElementById('manualStuName').value.trim();
   const dni = document.getElementById('manualStuDni').value.replace(/\D/g, '');
@@ -2040,6 +2354,8 @@ function handleCoordinatorManualStudentSubmit(e) {
     showToast('Ingresá el Nombre y Apellido y el DNI del alumno.', 'error');
     return;
   }
+
+  await syncFromServerIfAvailable(true);
 
   const existing = appState.students.find((s) => s.dni === dni);
   if (existing) {
@@ -2060,29 +2376,31 @@ function handleCoordinatorManualStudentSubmit(e) {
     logs: []
   });
 
-  saveState();
+  await saveState();
   renderApp();
-  showToast(`Alumno ${name} (${year} "${division}") registrado manualmente.`, 'success');
+  showToast(`Alumno ${name} (${year} "${division}") registrado y sincronizado en la nube.`, 'success');
 }
 
-function deleteStudentRecord(studentId) {
+async function deleteStudentRecord(studentId) {
   if (!confirm('¿Seguro que deseás eliminar el registro de este alumno?')) return;
+  await syncFromServerIfAvailable(true);
   appState.students = appState.students.filter((s) => s.id !== studentId);
-  saveState();
+  await saveState(true);
   renderApp();
   showToast('Alumno eliminado de la base de datos.', 'success');
 }
 
-function handleSaveCoordinatorConfig(e) {
+async function handleSaveCoordinatorConfig(e) {
   e.preventDefault();
+  await syncFromServerIfAvailable(true);
   appState.config.coordUsername = document.getElementById('cfgCoordUser').value.trim() || 'coordinador';
   appState.config.coordPassword = document.getElementById('cfgCoordPass').value || 'epet4';
   appState.config.directorName = document.getElementById('cfgDirectorName').value.trim();
   appState.config.coordinatorName = document.getElementById('cfgCoordinatorName').value.trim();
 
-  saveState();
+  await saveState(true);
   renderApp();
-  showToast('Usuario, contraseña y autoridades actualizados.', 'success');
+  showToast('Usuario, contraseña y autoridades actualizados en la nube.', 'success');
 }
 
 // ==========================================================================
@@ -2463,4 +2781,12 @@ window.addEventListener('DOMContentLoaded', () => {
   processLogoTransparency();
   renderApp();
   syncFromServerIfAvailable();
+
+  // Sincronización automática en tiempo real con la base de datos en la nube (cada 5 segundos)
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    const activeTag = document.activeElement?.tagName;
+    if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+    syncFromServerIfAvailable();
+  }, 5000);
 });

@@ -1025,3 +1025,46 @@ h1, h2, h3, h4, .font-display {
     grid-template-columns: 1fr;
   }
 }
+
+/* Botón de Ver / Ocultar Contraseña (Ojito Neumórfico) */
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrap .neu-input {
+  padding-right: 3.1rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  box-shadow: var(--neu-extruded-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  padding: 0;
+}
+
+.password-toggle-btn:hover {
+  color: var(--mech-orange);
+  border-color: rgba(255, 77, 45, 0.35);
+}
+
+.password-toggle-btn.showing {
+  color: var(--tech-yellow);
+  box-shadow: var(--neu-inset-sm);
+}
+
